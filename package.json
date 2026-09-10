@@ -1,0 +1,11 @@
+{
+  "name": "colmo-demo",
+  "private": true,
+  "type": "module",
+  "description": "COLMO AI butler interaction demos, organized by scene",
+  "scripts": {
+    "test": "node test-wake.mjs && node test-tts.mjs",
+    "test:ai-1": "node test-wake.mjs",
+    "test:ai-3": "node test-tts.mjs"
+  }
+}
