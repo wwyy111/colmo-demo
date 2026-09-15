@@ -1,16 +1,30 @@
+import {icon} from './icons.js';
 const nav=document.querySelector('#global-nav'),toggle=document.querySelector('#nav-toggle'),page=document.querySelector('.page'),detail=document.querySelector('#scene-detail');
 document.querySelector('#scene-title').parentElement.append(toggle);
 toggle.setAttribute('aria-label','切换场景');
 const shade=document.createElement('div');shade.className='scene-backdrop';shade.hidden=true;document.body.append(shade);
-const close=document.createElement('button');close.className='scene-close';close.textContent='关闭 ×';nav.querySelector('.site-header').append(close);
+const close=document.createElement('button');close.className='scene-close';close.innerHTML='关闭 '+icon('x');nav.querySelector('.site-header').append(close);
 nav.setAttribute('role','dialog');nav.setAttribute('aria-modal','true');nav.setAttribute('aria-label','场景切换');
 let previousFocus=null;
-function showNav(show){const wasOpen=!nav.classList.contains('nav-hidden');if(show&&!wasOpen)previousFocus=document.activeElement;nav.classList.toggle('nav-hidden',!show);nav.inert=!show;shade.hidden=!show;page.inert=show;toggle.setAttribute('aria-expanded',String(show));toggle.textContent='⌄';if(show&&!wasOpen)nav.querySelector('#scenes button.active')?.focus({preventScroll:true});if(!show&&wasOpen)(previousFocus?.isConnected?previousFocus:toggle)?.focus({preventScroll:true});}
+function showNav(show){const wasOpen=!nav.classList.contains('nav-hidden');if(show&&!wasOpen)previousFocus=document.activeElement;nav.classList.toggle('nav-hidden',!show);nav.inert=!show;shade.hidden=!show;page.inert=show;toggle.setAttribute('aria-expanded',String(show));toggle.innerHTML=icon('chevron-down');if(show&&!wasOpen)nav.querySelector('#scenes button.active')?.focus({preventScroll:true});if(!show&&wasOpen)(previousFocus?.isConnected?previousFocus:toggle)?.focus({preventScroll:true});}
 toggle.onclick=()=>showNav(true);close.onclick=()=>showNav(false);shade.onclick=()=>showNav(false);
 document.querySelector('#scenes').addEventListener('click',e=>{if(e.target.closest('button'))showNav(false);});
-window.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)<10)return;if(!nav.classList.contains('nav-hidden')){if(e.deltaY>0)showNav(false);return;}if(!e.target.closest('.detail-scroll,.steps,dialog,.basis'))showNav(e.deltaY<0);},{passive:true});
-let lastY=null;window.addEventListener('touchstart',e=>{lastY=e.touches[0]?.clientY;},{passive:true});window.addEventListener('touchmove',e=>{const y=e.touches[0]?.clientY;if(lastY!==null&&Math.abs(y-lastY)>14&&!e.target.closest('.detail-scroll,.steps,dialog,.basis'))showNav(y>lastY);lastY=y;},{passive:true});
+window.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)<10)return;if(!nav.classList.contains('nav-hidden')){if(e.deltaY<0)showNav(false);return;}if(!e.target.closest('.room-frame,.detail-panel,.steps,dialog,details,button,a,input,select,textarea,audio,video,[role="slider"]'))showNav(e.deltaY>0);},{passive:true});
+let lastY=null;window.addEventListener('touchstart',e=>{lastY=e.touches[0]?.clientY;},{passive:true});window.addEventListener('touchmove',e=>{const y=e.touches[0]?.clientY;if(lastY!==null&&Math.abs(y-lastY)>14&&!e.target.closest('.room-frame,.detail-panel,.steps,dialog,details,button,a,input,select,textarea,audio,video,[role="slider"]'))showNav(y>lastY);lastY=y;},{passive:true});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){showNav(false);detail.open=false;}if(e.key==='Tab'&&!nav.classList.contains('nav-hidden')){const items=[...nav.querySelectorAll('a,button')].filter(e=>!e.disabled);const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
 detail.addEventListener('mouseenter',()=>detail.open=true);detail.addEventListener('mouseleave',()=>{if(!detail.contains(document.activeElement))detail.open=false;});detail.addEventListener('focusin',()=>detail.open=true);detail.addEventListener('focusout',e=>{if(!detail.contains(e.relatedTarget))detail.open=false;});
 showNav(false);
 const observer=new ResizeObserver(()=>window.dispatchEvent(new Event('resize')));observer.observe(document.querySelector('.room-frame'));
+
+document.querySelector('#replay').innerHTML=icon('rotate-ccw')+'重演本时间点';
+document.querySelector('#competitor').innerHTML='竞品策略'+icon('arrow-up-right');
+document.querySelector('#catalog-button').innerHTML='全部交互'+icon('arrow-up-right');
+document.querySelector('[data-view="focus"]').innerHTML=icon('focus')+'聚焦';
+document.querySelector('#close-modal').innerHTML=icon('x');
+document.querySelector('.quiet-link').innerHTML='原版演示'+icon('arrow-up-right');
+document.querySelector('.basis summary span').innerHTML=icon('plus');
+const needs=document.querySelector('.task-context');
+needs.querySelector('summary').innerHTML='任务需求与用户痛点 '+icon('chevron-down');
+needs.addEventListener('mouseenter',()=>needs.open=true);
+needs.addEventListener('mouseleave',()=>{if(!needs.contains(document.activeElement))needs.open=false;});
+needs.addEventListener('focusout',e=>{if(!needs.contains(e.relatedTarget))needs.open=false;});

@@ -1,0 +1,61 @@
+/* The presentation belongs to the room, separate from the reference panel. */
+.room-frame{container-type:inline-size}
+#scene-media{position:absolute;right:12px;top:90px;bottom:104px;width:36%;z-index:4;display:flex;flex-direction:column;gap:10px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:2px}
+#scene-media[hidden]{display:none}
+.room-frame:has(#scene-media:not([hidden])) #scene{width:64%}
+#scene-media .live-avatar{min-height:115px;flex:none;border-radius:8px;background:#152923cc;padding:10px}
+#scene-media .avatar-light{top:16px;height:36px}
+#scene-media .live-avatar>small{display:none}
+#scene-media .live-avatar>span{font-size:10px}
+.scene-cards{display:flex;flex-direction:column;gap:10px}
+.scene-cards img{display:block;width:100%;border-radius:8px}
+body:not(.demo-running) #scene-media .avatar-light{animation-play-state:paused}
+.scene-fault{padding:13px;background:#f7f4ebf2;border-radius:8px;color:#253b32}
+.scene-fault small{font-size:10px;color:#7d622f}.scene-fault h3{font-size:14px;margin:7px 0}.scene-fault p{font-size:12px;line-height:1.65;margin:0}
+#demo-controls{position:absolute;bottom:10px;left:12px;right:12px;z-index:5;display:flex;flex-wrap:nowrap;gap:8px;padding:6px 9px;border:0;border-radius:8px;background:#172a32cf;color:#fff;backdrop-filter:blur(12px)}
+#demo-controls button{display:flex;width:30px;height:30px;padding:6px;background:transparent;border:0;color:#fff;flex:none}
+#demo-controls button:hover{background:#ffffff20}#demo-controls button:focus-visible{outline:2px solid #fff;outline-offset:1px}
+#demo-controls .ui-icon{width:17px;height:17px}
+#demo-progress{flex:1;min-width:20px;height:4px;accent-color:#b9d6c8}
+#demo-clock{font-size:10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.room-frame .camera,.room-frame:hover .camera{bottom:65px;font-size:11px;padding:4px}
+.room-frame .room-caption{bottom:108px}.room-frame .room-top{pointer-events:none}
+@container(max-width:420px){#scene-media{width:41%;right:7px;top:85px}.room-frame:has(#scene-media:not([hidden])) #scene{width:58%}#scene-media .live-avatar>span{font-size:9px}.scene-fault{padding:9px}.scene-fault h3{font-size:12px}.scene-fault p{font-size:11px}}
+
+/* In-scene overlays: no reserved black column. */
+.room-frame:has(#scene-media:not([hidden])) #scene{width:100%}
+#scene-media{top:90px;bottom:110px;width:34%;overflow:hidden;gap:8px;background:none;padding:0}
+#scene-media .live-avatar{height:58px;min-height:58px;background:none;padding:0;justify-content:flex-end;overflow:visible}
+#scene-media .avatar-light{height:28px;top:6px}
+#scene-media .live-avatar>span{font-size:9px;text-shadow:0 1px 4px #000}
+#scene-media .glass-layer{height:28px;top:8px}
+#scene-media .scene-cards{flex:1;min-height:0;display:flex;align-items:flex-end;gap:8px}
+#scene-media .scene-cards img{width:100%;height:0;min-height:0;flex:1;object-fit:contain;object-position:right top;border-radius:6px}
+#scene-subtitle{position:absolute;z-index:5;bottom:60px;left:7%;right:7%;margin:0;text-align:center;font-size:13px;line-height:1.65;color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000;pointer-events:none}
+.room-frame:after{content:'';position:absolute;inset:auto 0 0;height:145px;background:linear-gradient(transparent,#09141caa);z-index:3;pointer-events:none}
+.room-frame .room-caption{background:none!important;bottom:105px;padding:8px 14px;z-index:4}
+#demo-controls{opacity:0;pointer-events:none;transition:opacity .18s;background:none;backdrop-filter:none;z-index:6;justify-content:flex-end}
+.room-frame:hover #demo-controls,.room-frame:focus-within #demo-controls{opacity:1;pointer-events:auto}
+#demo-controls>.seek-track{display:block;position:relative;flex:1;min-width:20px;height:30px}
+#demo-progress{position:absolute;inset:0;width:100%;height:30px;padding:0;margin:0;appearance:none;background:transparent;cursor:pointer;z-index:2}
+#demo-progress::-webkit-slider-runnable-track{height:3px;background:#ffffff70;border-radius:3px}
+#demo-progress::-webkit-slider-thumb{appearance:none;width:12px;height:12px;margin-top:-4.5px;border-radius:50%;background:#fff;box-shadow:0 0 3px #0005}
+#demo-progress::-moz-range-track{height:3px;background:#ffffff70}
+#demo-progress::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:white}
+.seek-marks{position:absolute;inset:10px 6px;pointer-events:none;z-index:3}
+.seek-marks i{position:absolute;width:1px;height:9px;background:#fff8}
+.room-frame .camera,.room-frame:hover .camera{bottom:auto;top:12px;right:12px;font-size:10px;background:#172a3260}
+.terminal-label{left:var(--label-x)!important;top:var(--label-y)!important;transform:translate(-50%,-100%)!important;padding:4px 6px!important;font-size:10px!important;background:#203e36bf!important}
+.terminal-label:after{display:none!important}
+.scene-cut:before{content:'';position:absolute;inset:0;z-index:7;pointer-events:none;background:#fff;animation:scene-flash .32s ease-out both}
+@keyframes scene-flash{from{opacity:.72}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.scene-cut:before{animation:none;opacity:0}}
+@media(hover:none){#demo-controls{opacity:1;pointer-events:auto}}
+#scene-media .scene-cards{flex:0 1 auto;align-items:flex-end;overflow:visible}
+#scene-media .scene-cards img{height:auto;flex:none;min-height:0;max-width:100%;object-fit:contain;object-position:center;border-radius:8px}
+.request-bubble{position:absolute;z-index:4;width:100px;padding:13px 15px;border-radius:14px;background:#fffffff0;transform:translate(-50%,-100%);pointer-events:none;filter:drop-shadow(0 3px 5px #152a3320)}
+.request-bubble[hidden]{display:none}.request-bubble:after{content:"";position:absolute;bottom:-7px;left:46px;border-width:8px 7px 0;border-style:solid;border-color:#fffffff0 transparent transparent}
+.request-bubble span{display:block;height:3px;background:#608277;border-radius:3px;margin:5px 0;transform-origin:left;animation:request-line 1.4s ease-in-out infinite}
+.request-bubble span:nth-child(2){width:80%;animation-delay:.15s}.request-bubble span:nth-child(3){width:55%;animation-delay:.3s}.request-bubble.paused span{animation-play-state:paused}
+@keyframes request-line{0%,100%{opacity:.45;transform:scaleX(.8)}50%{opacity:1;transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.request-bubble span{animation:none}}
