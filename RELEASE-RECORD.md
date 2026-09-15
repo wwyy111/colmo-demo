@@ -5,7 +5,14 @@
 - 远端名：backup；分支：feat/wakeup-strategy-page
 - origin 保留为原作者仓库，不向它推送。
 
-## 最新发布（2026-09-15）
+## 最新发布：甲方审阅小改版
+- 页面版本：7bfcdef；仅更新 AI 介入点为五条简短说明及对应排版。
+- 交互路径、时序、模型动画与 e9b2b8d 保持一致。
+- 发布前备份：/root/colmo-ai-1-backups/pre-7bfcdef/ai-1
+- 暂停的可视化介入流程方案保存在本地提交 de30a49；四阶段与新分镜尚未实施。
+- 本次未同步 GitHub。
+
+## 上次发布（2026-09-15）
 - 页面版本：e9b2b8d
 - 页面：https://creaitor.cn/COLMO/demo/ai-1/
 - 更新范围：仅 ai-1 晨间唤醒；交互一场景呈现及全程声音状态修复。
