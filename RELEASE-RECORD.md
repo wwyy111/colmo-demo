@@ -5,7 +5,15 @@
 - 远端名：backup；分支：feat/wakeup-strategy-page
 - origin 保留为原作者仓库，不向它推送。
 
-## 已发布版本
+## 最新发布（2026-09-15）
+- 页面版本：e9b2b8d
+- 页面：https://creaitor.cn/COLMO/demo/ai-1/
+- 更新范围：仅 ai-1 晨间唤醒；交互一场景呈现及全程声音状态修复。
+- 发布前备份：/root/colmo-ai-1-backups/pre-e9b2b8d/ai-1
+- 线上 strategy.js SHA-256 与本地一致；冲突语音返回 HTTP 200。
+- 已保存本地 Git 版本；本次未同步 GitHub。
+
+## 历史已发布版本
 - 版本：bd38e42
 - 页面：https://creaitor.cn/COLMO/demo/ai-1/
 - 服务器页面目录：/www/wwwroot/creaite.cn/COLMO/demo/ai-1
