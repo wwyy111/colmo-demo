@@ -52,6 +52,10 @@ export function createRoom(container,hotspots,onSelect){
   cyl(.16,.16,.03,x,.63,-2.03,m.gold);cyl(.015,.015,.39,x,.83,-2.03,m.gold);cyl(.2,.28,.24,x,1.12,-2.03,m.pillow);
   const lampMaterial=warmMat.clone();cyl(.245,.245,.014,x,.995,-2.03,lampMaterial);const light=new THREE.PointLight('#ffd5a1',index===0?1.7:.14,4,2);light.position.set(x,1.03,-2.03);scene.add(light);lamps.push({light,mat:lampMaterial});
  }
+ // Wall control screen used by the configuration storyboard.
+ box(.8,.52,.05,1.1,1.55,-3.34,m.dark);
+ box(.72,.44,.008,1.1,1.55,-3.307,new THREE.MeshBasicMaterial({color:'#f1f4ed'}));
+ for(let i=0;i<3;i++)box(.54,.045,.01,1.1,1.67-i*.105,-3.297,new THREE.MeshBasicMaterial({color:i===2?'#48675a':'#b3c0b5'}));
  // Device terminal and the authorised watch on the user's nightstand.
  box(.28,.17,.03,-3.56,.72,-1.63,m.dark);box(.245,.13,.007,-3.56,.72,-1.61,new THREE.MeshBasicMaterial({color:'#86b9c8'}));
  box(.055,.027,.28,-3.76,.629,-1.82,m.dark);rounded(.12,.035,.14,.012,-3.76,.65,-1.82,m.metal);box(.087,.005,.104,-3.76,.671,-1.82,m.dark);
@@ -96,24 +100,25 @@ export function createRoom(container,hotspots,onSelect){
  const hazeCanvas=document.createElement('canvas');hazeCanvas.width=hazeCanvas.height=64;const context=hazeCanvas.getContext('2d'),gradient=context.createRadialGradient(32,32,0,32,32,32);gradient.addColorStop(0,'rgba(215,230,236,.7)');gradient.addColorStop(1,'rgba(215,230,236,0)');context.fillStyle=gradient;context.fillRect(0,0,64,64);const hazeTex=new THREE.CanvasTexture(hazeCanvas);const haze=[];for(let i=0;i<9;i++){const mesh=new THREE.Sprite(new THREE.SpriteMaterial({map:hazeTex,opacity:.15,transparent:true,depthWrite:false}));mesh.scale.set(.18,.3,1);root.add(mesh);haze.push(mesh);}
  const labelData=[['air','空调 · 新风',[-.55,3.32,-3.1]],['humidifier','加湿器',[-4.15,1.1,-.32]],['lamp','床侧柔光',[.62,1.42,-2.03]],['speaker','音箱 · 手表',[-3.5,1.1,-1.55]],['curtain','智能窗帘',[-4.62,2.7,-.7]],['water','主卫备水',[4.35,2.95,-1.9]]];
  const labels=labelData.map(([id,title,pos])=>{const el=document.createElement('button');el.className='hotspot';el.innerHTML='<i></i>'+title;el.onclick=()=>onSelect(id);hotspots.append(el);return{id,el,pos:new THREE.Vector3(...pos)};});
- let actionTime=0,actionPlaying=false,actionPreview=false,lastTick=0;
+ let actionTime=0,actionPlaying=false,actionPreview=false,lastTick=0,setupStart=performance.now();
  const motionUI={play:document.querySelector('#action-play'),reset:document.querySelector('#action-reset'),seek:document.querySelector('#action-seek'),caption:document.querySelector('#action-caption'),readout:document.querySelector('#action-readout')};
  function updateActionUI(a){motionUI.seek.value=actionTime;motionUI.caption.textContent=a.label;motionUI.readout.textContent=`${Math.round(actionTime)} / ${actionDuration} 秒 · 靠背 ${Math.round(a.bed)}° · 窗帘 ${Math.round(a.curtain*100)}%`;motionUI.play.textContent=actionPlaying?'Ⅱ 暂停动作':'▷ 播放动作';container.dataset.actionStage=String(a.stage);container.dataset.actionTime=String(actionTime.toFixed(1));container.dataset.bedAngle=String(a.bed.toFixed(1));}
  motionUI.play.onclick=()=>{if(!actionPreview||actionTime>=actionDuration)actionTime=0;actionPreview=true;actionPlaying=!actionPlaying;lastTick=performance.now();document.dispatchEvent(new Event('action-preview-start'));};
  motionUI.reset.onclick=()=>{actionTime=0;actionPreview=true;actionPlaying=true;lastTick=performance.now();document.dispatchEvent(new Event('action-preview-start'));};
  motionUI.seek.oninput=()=>{actionPreview=true;actionPlaying=false;actionTime=Number(motionUI.seek.value);document.dispatchEvent(new Event('action-preview-start'));};
  let target={day:.2,light:.08,curtain:.04,active:[]},current={day:.2,light:.08,curtain:.04},viewTarget=null;
- const views={overview:{pos:[10.5,8.3,12],target:[0,1.1,0]},bed:{pos:[3.6,5.3,7.1],target:[-1.4,1,-.8]},bath:{pos:[8,4.6,4],target:[3.45,1.55,-1.7]}};
+ const views={setup:{pos:[4.8,3.5,3.7],target:[.8,1.25,-2.0]},overview:{pos:[10.5,8.3,12],target:[0,1.1,0]},bed:{pos:[3.6,5.3,7.1],target:[-1.4,1,-.8]},bath:{pos:[8,4.6,4],target:[3.45,1.55,-1.7]}};
  controls.addEventListener('start',()=>viewTarget=null);
  function resize(){const w=container.clientWidth,h=container.clientHeight;camera.aspect=w/h;camera.fov=w/h<.9?58:38;camera.updateProjectionMatrix();renderer.setSize(w,h);}new ResizeObserver(resize).observe(container);resize();
  const clock=new THREE.Clock(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;let visible=true;document.addEventListener('visibilitychange',()=>visible=!document.hidden);
  function frame(){requestAnimationFrame(frame);if(!visible)return;const t=clock.getElapsedTime(),now=performance.now();
  if(actionPlaying){actionTime=Math.min(actionDuration,actionTime+Math.min(.1,(now-lastTick)/1000));if(actionTime>=actionDuration)actionPlaying=false;}lastTick=now;
- const acted=actionPreview?actionAt(actionTime):nodeAction(target.nodeNumber||11);
+ let acted=actionPreview?actionAt(actionTime):nodeAction(target.nodeNumber||11);
+ if(target.storyboard==='setup'){const u=target.setupMoment===0?Math.min(1,(now-setupStart)/4500):1;acted={...actionAt(0),sit:1,edge:1,stand:1,walk:u<1?.1:0,wash:0,setup:u};container.dataset.storyboard=u<1?'walk-to-panel':'configure-panel';}
  if(actionPreview){updateActionUI(acted);document.querySelector('#scene-time').textContent=['06:55','06:57','07:00','07:02','07:05','07:10'][acted.stage];document.querySelector('#scene-stage').textContent='人物动作预演 · 非清醒识别结果';}else{container.dataset.actionStage='node';}
  const visual=actionPreview?{...target,day:acted.day,light:acted.light,curtain:acted.curtain}:target;
  bedBack.rotation.x=acted.bed*Math.PI/180;bedLink.scale.y=1+acted.bed/32;bedLink.position.y=.53+acted.bed/160;
- userAvatar.pose(acted,actionPreview?actionTime:t);partnerAvatar.pose(acted,t,true);userCover.visible=acted.edge<.1;
+ userAvatar.pose(acted,actionPreview?actionTime:t);partnerAvatar.pose({...acted,setup:undefined},t,true);userCover.visible=acted.edge<.1;
  for(const k of ['day','light','curtain'])current[k]=THREE.MathUtils.lerp(current[k],visual[k]??current[k],reduced?1:.035);
  sun.intensity=.8+current.day*3;skyMat.color.setRGB(.27+current.day*.35,.4+current.day*.3,.53+current.day*.25);beam.material.opacity=current.curtain*.11;
  curtains.forEach(({panel,side})=>{panel.position.z=-1.63+side*(.48+current.curtain*.6);panel.scale.z=1-current.curtain*.62;});
@@ -123,7 +128,7 @@ export function createRoom(container,hotspots,onSelect){
  watchRing.visible=Boolean(target.haptic);watchRing.scale.setScalar(reduced?1:1+Math.sin(t*7)*.15);waterDots.forEach((p,i)=>{p.visible=Boolean(target.water);p.position.y=.3+(reduced?i/5:(t*.3+i/5)%1)*1.3;});pipeMat.color.set(target.danger?'#ee8b72':'#8dbecf');pipeMat.opacity=target.water?.8:.2;path.visible=target.active.includes('water');
 
  if(viewTarget){camera.position.lerp(new THREE.Vector3(...viewTarget.pos),.045);controls.target.lerp(new THREE.Vector3(...viewTarget.target),.045);if(camera.position.distanceTo(new THREE.Vector3(...viewTarget.pos))<.01)viewTarget=null;}
- controls.update();for(const item of labels){const p=item.pos.clone().project(camera),x=(p.x*.5+.5)*container.clientWidth,y=(-p.y*.5+.5)*container.clientHeight;item.el.style.left=x+'px';item.el.style.top=y+'px';item.el.hidden=p.z>1||x<42||x>container.clientWidth-42||y<145||y>container.clientHeight-120;}renderer.render(scene,camera);
+ controls.update();for(const item of labels){const p=item.pos.clone().project(camera),x=(p.x*.5+.5)*container.clientWidth,y=(-p.y*.5+.5)*container.clientHeight;item.el.style.left=x+'px';item.el.style.top=y+'px';item.el.hidden=target.storyboard==='setup'||p.z>1||x<42||x>container.clientWidth-42||y<145||y>container.clientHeight-120;}renderer.render(scene,camera);
  }frame();
- return{setView(name){viewTarget=views[name]||views.overview;},setState(next){target=next;actionPlaying=false;actionPreview=false;motionUI.play.textContent='▷ 播放动作';motionUI.caption.textContent='动作预演 · 窗帘开启 / 靠背抬升 / 人物起身';motionUI.readout.textContent='34 秒 · 使用者侧靠背辅助已授权（模拟）';motionUI.seek.value=0;labels.forEach(l=>l.el.classList.toggle('active',next.active.includes(l.id)));}};
+ return{setView(name){viewTarget=views[name]||views.overview;},setState(next){target=next;setupStart=performance.now();actionPlaying=false;actionPreview=false;motionUI.play.textContent='▷ 播放动作';motionUI.caption.textContent='动作预演 · 窗帘开启 / 靠背抬升 / 人物起身';motionUI.readout.textContent='34 秒 · 使用者侧靠背辅助已授权（模拟）';motionUI.seek.value=0;labels.forEach(l=>l.el.classList.toggle('active',next.active.includes(l.id)));}};
 }

@@ -21,10 +21,12 @@ export function createAvatar(root,{color='#718f9e',skin='#c2a184'}={}){
   hip=mix(hip,[.04,1.02,-.55],edge);hip=mix(hip,[.65,.89,-.55],stand);
   // Route goes around the open front end of the glass partition, then approaches the basin.
   if(walk>0){const points=[[.65,.89,-.55],[1.25,.89,.7],[2.65,.89,.7],[3.4,.89,-2.05]];const q=walk*3,i=Math.min(2,Math.floor(q));hip=mix(points[i],points[i+1],q-i);}
+  if(a.setup!==undefined)hip=mix([1.25,.89,1.1],[1.25,.89,-2.52],Math.min(a.setup,1));
   group.position.set(...hip);
   let yaw=edge*Math.PI/2;
   if(walk>0&&walk<1)yaw=walk<1/3?.45:walk<2/3?Math.PI/2:Math.PI;
   if(walk>=1)yaw=Math.PI;
+  if(a.setup!==undefined)yaw=Math.PI;
   group.rotation.y=yaw;
   const tilt=(-Math.PI/2+angle)*(1-sit)+wash*.18;
   const rot=new THREE.Matrix4().makeRotationX(tilt);
@@ -36,6 +38,7 @@ export function createAvatar(root,{color='#718f9e',skin='#c2a184'}={}){
    points[side+'shoulder']=upper([sign*.22,.47,0]);
    points[side+'elbow']=upper([sign*(.25+stretch*.19),.22+stretch*.44, .04+wash*.28]);
    points[side+'hand']=upper([sign*(.24+stretch*.28),.01+stretch*.86+wash*.4,.12+wash*.4+stride*sign*.55]);
+   if(a.setup!==undefined&&side==='R'&&a.setup>=1){points[side+'elbow']=upper([.24,.27,.27]);points[side+'hand']=upper([.18,.48,.46]);}
    points[side+'hip']=[sign*.12,0,0];
    points[side+'knee']=mix([sign*.12,-.03,.45],[sign*.12,-.42,.25*(1-stand)+stride*sign],Math.max(sit,stand));
    points[side+'foot']=mix([sign*.12,-.06,.85],[sign*.12,-.83,.27*(1-stand)-stride*sign],Math.max(edge,stand));
