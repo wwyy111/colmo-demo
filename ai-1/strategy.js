@@ -73,25 +73,31 @@ function render(){
  $('#tasks').replaceChildren(...tasks.map((t,i)=>{const b=button('',()=>{task=i;selectNode(interactions.find(n=>n.task===t.name).id);},i===task);b.innerHTML=`<b>0${i+1}</b>${t.name}`;return b;}));
  $('#task-goal').textContent=tasks[task].goal;$('#task-pain').textContent=tasks[task].pain;
  $('#steps').replaceChildren(...list.map((item,i)=>{const b=button('',()=>selectNode(item.id),item.id===selected);b.innerHTML=`<span>${group(i,list.length)} · ${String(i+1).padStart(2,'0')}</span><strong>${esc(item.name.split('｜')[1])}</strong>`;b.title=item.name;return b;}));
- $('#interaction-label').innerHTML=`交互 ${idx+1} <span class="interaction-stage">/ ${group(idx,list.length)}</span>`;$('#category').textContent=n.category;$('#interaction-title').textContent=n.name.split('｜')[1];$('#interaction-description').textContent=n.description.split('｜').slice(1).join('｜');$('#intervention-text').textContent=n.intervention;
+ $('#interaction-label').innerHTML=`交互 ${idx+1} <span class="interaction-stage">/ ${group(idx,list.length)}</span>`;$('#category').textContent=n.category;$('#interaction-title').textContent=n.name.split('｜')[1];$('#interaction-description').textContent=n.description.split('｜').slice(1).join('｜');$('#intervention-text').innerHTML=isExample()?`<div class="ai-flow" aria-label="AI 介入流程"><button data-ai-step="0">理解需求<span>语音解析 · 设备关联</span></button><span class="ai-flow-link" aria-hidden="true">→</span><button data-ai-step="1">推荐草案<span>偏好匹配 · 策略生成</span></button></div><div id="ai-step-explanation"></div><button id="ai-exception">异常分支 · 缺项 / 冲突 / 能力未知</button><p class="ai-handoff">本交互产出推荐草案；确认体验与反馈调整留到交互二。</p>`:esc(n.intervention);
+ if(isExample()){document.querySelectorAll('[data-ai-step]').forEach(b=>b.onclick=()=>{moment=Number(b.dataset.aiStep);branch='normal';syncRoom();renderMoment();});$('#ai-exception').onclick=()=>{moment=1;branch='missing';syncRoom();renderMoment();};}
  const phases=['信任建立期','协作磨合期','成熟托管期'];$('#phases').replaceChildren(...phases.map((p,i)=>{const b=button(p,()=>{phase=i;renderMoment();},i===phase);b.disabled=!n.phase?.includes('P'+(i+1));b.title=b.disabled?'本交互暂无该阶段方案':p;return b;}));
  $('#basis-content').innerHTML=`<p><strong>用户需求</strong>　${esc(tasks[task].goal)}</p><p><strong>边界</strong>　${esc(n.boundary)}</p>${isExample()?'<p><strong>介入过多</strong>　反复追问、长段解释或擅自加入设备，会增加配置负担；越过授权与家庭免扰规则，还可能打扰伴侣、削弱信任。</p><p><strong>介入不足</strong>　不提示关键缺项、规则冲突或未知设备能力，会让用户误以为方案完整可用，导致后续唤醒安排不符合预期。</p>':''}`;
- $('#timeline').hidden=!isExample();$('#timeline').replaceChildren(...['开始配置','草案说明与确认'].map((v,i)=>{const b=button('',()=>{moment=i;branch='normal';editing=false;syncRoom();renderMoment();},moment===i);b.innerHTML=`<small>时间点 ${i+1}</small><span>${v}</span>`;return b;}));
+ $('#timeline').hidden=!isExample();$('#timeline').replaceChildren(...['表达需求','推荐草案与说明'].map((v,i)=>{const b=button('',()=>{moment=i;branch='normal';editing=false;syncRoom();renderMoment();},moment===i);b.innerHTML=`<small>时间点 ${i+1}</small><span>${v}</span>`;return b;}));
  const activeStep=$('#steps .active');if(activeStep)$('#steps').scrollLeft=Math.max(0,activeStep.offsetLeft-$('#steps').offsetLeft-20);
  syncRoom();renderMoment();
 }
 function syncRoom(){const n=nodes.find(n=>n.id===selected);if(n)room?.setState({...roomState(n),storyboard:isExample()?'setup':undefined,setupMoment:moment,setupPhase:presentation.running?demoStage:'configure'});room?.setView(task===2?'bath':isExample()?(presentation.running&&demoStage==='overview'?'overview':'focusInput'):'bed');$('#scene-time').textContent=isExample()?'首次配置':n?.time||'任务情境';$('#scene-stage').textContent=isExample()?'中控屏前配置唤醒安排':current().name.split('｜')[1];document.querySelectorAll('[data-view]').forEach(b=>{const active=b.dataset.view===(presentation.running&&demoStage==='overview'?'overview':'focus');b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});renderDemo();$('#room-caption').textContent=isExample()?'用户走到中控屏前进行配置；右侧展示对应 App 内容。':'原版设备与人物情境示意 · 时间点表现待细化';}
 function renderMoment(){
+ if(isExample()){
+ document.querySelectorAll('[data-ai-step]').forEach(b=>{const active=Number(b.dataset.aiStep)===moment&&branch==='normal';b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+ $('#ai-exception').classList.toggle('active',branch!=='normal');$('#ai-exception').setAttribute('aria-pressed',String(branch!=='normal'));
+ $('#ai-step-explanation').innerHTML=branch!=='normal'?'<strong>识别异常，提出补充或替代建议</strong><p>缺项时针对性追问；规则冲突时说明限制；设备能力未知时暂不纳入。补充或调整后重新生成草案，不直接触发设备体验。</p>':moment===0?'<strong>从用户表达中提取可执行的条件</strong><p>识别起床时间、唤醒偏好与免扰要求，关联已授权且能力明确的设备。例如将“七点叫我，别吵醒伴侣”转成时间目标与安静提醒约束。</p>':'<strong>结合偏好，生成并解释推荐方案</strong><p>参考已授权的历史偏好或常用方案，推荐设备组合、顺序与强度，并说明推荐理由与备选差异。展示草案，提示可在下一交互确认并体验。</p>';
+ }
  renderSceneMedia();
  const example=isExample(),fault=branch!=='normal';
  $('#timeline').querySelectorAll('button').forEach((b,i)=>{b.classList.toggle('active',i===moment);b.setAttribute('aria-pressed',String(i===moment));});
  $('#phases').querySelectorAll('button').forEach((b,i)=>{b.classList.toggle('active',i===phase);b.setAttribute('aria-pressed',String(i===phase));});
  $('#branches').hidden=!example||moment===0;
- $('#branches').innerHTML='<label for="branch-select">情况演示</label><select id="branch-select">'+[['exceptions','异常处理 · 3 项'],['normal','正常情况 · 草案生成']].map(([v,t])=>'<option value="'+v+'" '+((fault?'exceptions':'normal')===v?'selected':'')+'>'+t+'</option>').join('')+'</select>'+(fault?'<div class="exception-tabs" role="group" aria-label="异常处理中的问题">'+Object.entries(faults).map(([id,f],i)=>'<button data-fault="'+id+'" aria-pressed="'+(id===branch)+'" class="'+(id===branch?'active':'')+'">'+(i+1)+' '+f.title+'</button>').join('')+'</div>':'');$('#branch-select').onchange=e=>{branch=e.target.value==='exceptions'?'missing':'normal';renderMoment();};document.querySelectorAll('[data-fault]').forEach(b=>b.onclick=()=>{branch=b.dataset.fault;renderMoment();});
+ $('#branches').innerHTML='<label for="branch-select">情况演示</label><select id="branch-select">'+[['normal','正常情况 · 草案生成'],['exceptions','另一种情况 · 生成异常']].map(([v,t])=>'<option value="'+v+'" '+((fault?'exceptions':'normal')===v?'selected':'')+'>'+t+'</option>').join('')+'</select>'+(fault?'<div class="exception-tabs" role="group" aria-label="异常处理中的问题">'+Object.entries(faults).map(([id,f],i)=>'<button data-fault="'+id+'" aria-pressed="'+(id===branch)+'" class="'+(id===branch?'active':'')+'">'+(i+1)+' '+f.title+'</button>').join('')+'</div>':'');$('#branch-select').onchange=e=>{branch=e.target.value==='exceptions'?'missing':'normal';renderMoment();};document.querySelectorAll('[data-fault]').forEach(b=>b.onclick=()=>{branch=b.dataset.fault;renderMoment();});
  $('#moment-title').textContent=!example?'交互信息已收录，表达设计待补充':moment===0?'描述偏好与权限':fault?{missing:'补齐会影响方案的关键项',conflict:'先确认家庭免扰边界',device:'说明暂不可确认的设备'}[branch]:confirmed?'草案已确认，准备进入联测':'草案已生成，等待你的确认';
  $('#carrier').textContent=example?'当前载体 · App':'任务载体见原有材料';
  $('#moment-note').textContent=!example?'保留原表信息，后续逐交互补充时间点与设计。':moment===0?'先复用已有信息，只补充影响安排的偏好与权限。':fault?'条件分支：处理后更新草案；不视为所有用户必经步骤。':'卡片与草案说明同步出现；说明结束后保持静默，等待用户操作。';
- $('#story-number').textContent=String(moment+1).padStart(2,'0');$('#user-story').textContent=!example?current().description:moment===0?'用户走到中控屏前，唤醒管家并描述起床时间、偏好与权限。':fault?'用户查看具体问题，补充信息或确认本次可用范围。':confirmed?'用户确认本次草案，接下来核验设备能力与执行回执。':'用户在中控屏前核对唤醒安排，选择确认、调整或稍后处理。';
+ $('#story-number').textContent=String(moment+1).padStart(2,'0');$('#user-story').textContent=!example?current().description:moment===0?'用户走到中控屏前，唤醒管家并描述起床时间、偏好与权限。':fault?'用户查看具体问题，补充信息或确认本次可用范围。':confirmed?'用户确认本次草案，接下来核验设备能力与执行回执。':'用户查看推荐草案与理由，了解可选方式，准备进入下一交互确认体验。';
  $('#channels').replaceChildren(...[['visual','视觉'],['audio','听觉'],['haptic','触觉']].map(([v,t])=>{const b=button(t,()=>{channel=v;renderChannel();},channel===v);if(v==='haptic'&&example){b.disabled=true;b.title='本交互不使用触觉反馈'};return b;}));
  $('#next').innerHTML=(example&&moment===0?'下一时间点':'下一交互')+icon('arrow-right');renderChannel();
 }
@@ -142,10 +148,11 @@ function fitSceneCards(){
 function renderSceneMedia(){
  const media=$('#scene-media');if(!media)return;
  media.hidden=!isExample()||['overview','walking','request'].includes(demoStage)&&presentation.running;
- if(media.hidden){$('#scene-subtitle').textContent='';return;}
+ if(media.hidden){$('#scene-subtitle').textContent='';$('#case-caption').hidden=true;return;}
  const fault=faults[branch];
  const caseId=moment?(fault?'exception':'normal'):null;
  if(caseId&&caseId!==lastCase){$('.room-frame').classList.remove('scene-cut');void $('.room-frame').offsetWidth;$('.room-frame').classList.add('scene-cut');}lastCase=caseId;
+ $('#case-caption').hidden=!caseId;$('#case-caption').textContent=caseId==='exception'?'另一种情况 · 生成方案时遇到异常':'正常情况 · 推荐草案';
  $('#scene-subtitle').textContent=moment?(fault?fault.detail:'我根据你的起床时间和唤醒偏好，整理了一套渐进唤醒安排，确认后再启用。'):'';
  media.innerHTML=avatarMarkup()+(moment?(fault?'<div class="scene-cards"><img src="./media/cards/exceptions.svg" alt="方案生成异常：关键缺项、家庭规则冲突、设备能力未知"></div>':'<div class="scene-cards"><img src="./media/cards/wakeup-draft.svg" alt="渐进唤醒方案卡"><img src="./media/cards/rules-scope.svg" alt="规则与设备范围卡"></div>'):'');
  media.querySelectorAll('img').forEach(img=>img.addEventListener('load',fitSceneCards,{once:true}));requestAnimationFrame(fitSceneCards);
@@ -157,6 +164,7 @@ function updatePlayer(){
  if(!draggingProgress)$('#demo-progress').value=Math.min(presentation.total,presentation.elapsed);
  document.body.classList.toggle('demo-running',presentation.running);
 }
+const caseCaption=document.createElement('div');caseCaption.id='case-caption';caseCaption.hidden=true;$('.room-frame').append(caseCaption);
 const subtitle=document.createElement('p');subtitle.id='scene-subtitle';subtitle.setAttribute('aria-live','polite');$('.room-frame').append(subtitle);
 const sceneMedia=document.createElement('aside');sceneMedia.id='scene-media';sceneMedia.setAttribute('aria-label','当前时间点视听呈现');$('.room-frame').append(sceneMedia);new ResizeObserver(fitSceneCards).observe(sceneMedia);
 const demoControls=document.createElement('div');demoControls.id='demo-controls';let elapsed=0;const marks=sequence.map(stage=>{const mark='<i title="'+stage.label+'" style="left:'+(elapsed/presentation.total*100)+'%"></i>';elapsed+=stage.duration;return mark;}).join('');demoControls.innerHTML='<span id="demo-status" hidden></span><div class="seek-track"><div class="seek-marks" aria-hidden="true">'+marks+'</div><input id="demo-progress" type="range" aria-label="播放进度" min="0" max="'+presentation.total+'" step="100" value="0"></div><button id="demo-play" aria-label="暂停"></button><button id="demo-restart" title="重播" aria-label="重播">'+icon('rotate-ccw')+'</button><button id="demo-sound" aria-label="静音"></button>';$('.room-frame').append(demoControls);
