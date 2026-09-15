@@ -3,11 +3,10 @@ export const sequence = [
   {id:'overview',label:'全景概览',duration:4000},
   {id:'walking',label:'走向中控屏',duration:4600},
   {id:'request',label:'用户描述需求',duration:3200},
-  {id:'configure',label:'开始配置',duration:4500},
-  {id:'normal',label:'正常情况 · 生成草案',duration:8500},
-  {id:'missing',label:'异常处理 · 1 / 3 · 关键缺项',duration:5500},
-  {id:'conflict',label:'异常处理 · 2 / 3 · 家庭规则冲突',duration:5500},
-  {id:'device',label:'异常处理 · 3 / 3 · 设备能力未知',duration:6500},
+  {id:'configure',label:'表达需求',moment:0,duration:4500},
+  {id:'normal',label:'推荐方案',moment:1,duration:8500},
+  {id:'experience',label:'确认体验 · 内容预览',moment:2,duration:6500},
+  {id:'feedback',label:'反馈与确认 · 内容预览',moment:3,duration:8500},
 ];
 export function createPresentation(onStage,onStop){
  let timer=null,version=0,running=false,index=-1,remaining=0,started=0,completed=false;

@@ -1,0 +1,57 @@
+.intervention-points li{margin:8px 0;line-height:1.65}
+.intervention-points li strong{display:block;color:#31584c;font-size:14px}
+.intervention-points li span{display:block;color:#40554d}
+.setup-context{margin:18px 0 16px;line-height:1.75}
+.setup-context h3{font-size:17px;margin:0 0 8px}
+.setup-context p{margin:6px 0;font-size:13px}
+.setup-user{padding:10px 12px;background:#f0f4f1;border-radius:8px}
+.setup-user span{display:block;color:#4a6358;font-size:12px}
+.setup-card{background:#fff;border:1px solid #d5dfd9;border-radius:12px;padding:18px;color:#243b32}
+.setup-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.setup-card h4{font-size:17px;margin:0;line-height:1.45}
+.setup-card header>span{font-size:11px;background:#edf2ee;border-radius:5px;padding:4px 7px;color:#456052}
+.setup-card dl,.setup-rules dl{margin:12px 0 0}
+.setup-card dl>div,.setup-rules dl>div{padding:10px 0;border-bottom:1px solid #edf0ed}
+.setup-card dl>div:last-child,.setup-rules dl>div:last-child{border-bottom:0}
+.setup-card dt,.setup-rules dt{font-size:12px;color:#53695e;margin-bottom:4px}
+.setup-card dd,.setup-rules dd{margin:0;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.setup-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.setup-actions button{border:1px solid #b9cfc2;border-radius:6px;background:#f4f7f5;color:#31584c;padding:8px 10px;font-size:12px}
+.setup-actions button:hover{background:#e6eee8}
+.setup-actions button:focus-visible{outline:2px solid #31584c;outline-offset:3px}
+.setup-rules{margin:16px 0;font-size:13px}
+.setup-rules summary{cursor:pointer;color:#31584c;padding:8px 0}
+.setup-preview-label{display:block;font-size:10px;color:white;text-shadow:0 1px 3px #152a33;margin:0 0 6px}
+.setup-card-compact{padding:12px;border:0;background:#fffffff0}
+.setup-card-compact h4{font-size:13px}
+.setup-card-compact header>span{font-size:10px}
+.setup-card-compact dl{margin:6px 0 0}
+.setup-card-compact dl>div{padding:6px 0}
+.setup-card-compact dt{font-size:10px}
+.setup-card-compact dd{font-size:11px;line-height:1.55}
+#scene-media:has(.setup-scene-copy){overflow:visible;bottom:70px}
+#scene-media .setup-scene-copy{min-height:0}
+@container(max-height:460px){.setup-card-compact dl>div:nth-child(n+2){display:none}}
+@media(max-width:700px){.setup-card{padding:14px}.setup-context h3{font-size:16px}}
+@media(max-width:600px){
+ html,body{height:auto;overflow:auto}
+ .page{height:auto;min-height:100dvh}
+ #workspace{flex:none}
+ .workspace-grid{overflow:visible;display:flex;flex-direction:column}
+ .stage-column{height:auto;flex:none;width:100%;max-width:100%;min-width:0}
+ .node-dock,.steps{min-width:0;max-width:100%}
+ .room-frame{height:360px!important;flex:none}
+ .story-strip,.node-dock{display:block}
+ .story-strip{display:flex}
+ .detail-panel{height:auto;overflow:visible;padding:0}
+ .detail-scroll{height:auto;overflow:visible}
+ .expression-layout{grid-template-columns:1fr}
+ .timeline{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .timeline button{min-width:0;padding:10px 12px}
+ .timeline:before,.timeline button:before{display:none}
+ .detail-footer{position:static;flex-wrap:wrap}
+ .intervention .basis{display:block}
+ #scene-media{top:76px;width:40%}
+ .room-frame .camera,.room-frame:hover .camera{top:auto;bottom:48px;right:10px}
+ .setup-card-compact dl>div:nth-child(n+2){display:none}
+}
