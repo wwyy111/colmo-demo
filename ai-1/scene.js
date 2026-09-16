@@ -1,4 +1,5 @@
 import {createAvatar} from './avatar.js';
+import {dialogue} from './setup-dialogue.js';
 import {actionAt,actionDuration,nodeAction} from './choreography.js';
 import * as THREE from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
@@ -112,21 +113,23 @@ export function createRoom(container,hotspots,onSelect){
  motionUI.play.onclick=()=>{if(!actionPreview||actionTime>=actionDuration)actionTime=0;actionPreview=true;actionPlaying=!actionPlaying;lastTick=performance.now();document.dispatchEvent(new Event('action-preview-start'));};
  motionUI.reset.onclick=()=>{actionTime=0;actionPreview=true;actionPlaying=true;lastTick=performance.now();document.dispatchEvent(new Event('action-preview-start'));};
  motionUI.seek.oninput=()=>{actionPreview=true;actionPlaying=false;actionTime=Number(motionUI.seek.value);document.dispatchEvent(new Event('action-preview-start'));};
- let currentView='overview';
+ let currentView='overview',storyShot=null,storyProgress=0;
  let target={day:.2,light:.08,curtain:.04,active:[]},current={day:.2,light:.08,curtain:.04},viewTarget=null;
  const views={focusInput:{pos:[2.25,2.05,-.55],target:[1.1,1.48,-3.05]},focusConfirm:{pos:[2.5,2.05,-.3],target:[1.1,1.5,-3.15]},setup:{pos:[4.8,3.5,3.7],target:[.8,1.25,-2.0]},overview:{pos:[10.5,8.3,12],target:[0,1.1,0]},bed:{pos:[3.6,5.3,7.1],target:[-1.4,1,-.8]},bath:{pos:[8,4.6,4],target:[3.45,1.55,-1.7]}};
+ Object.assign(views,{setupInput:{pos:[2.1,2.45,.7],target:[1.55,1.5,-2.7]},setupWide:{pos:[4.5,4.2,5.7],target:[.2,1.3,-1.5]},setupLight:{pos:[2.65,3.2,2.8],target:[.95,1.03,-1.95]},setupCurtain:{pos:[2.7,4.4,5.4],target:[-2.1,1.6,-1.3]}});
  controls.addEventListener('start',()=>viewTarget=null);
  function resize(){const w=container.clientWidth,h=container.clientHeight;camera.aspect=w/h;camera.fov=w/h<.9?58:38;camera.updateProjectionMatrix();renderer.setSize(w,h);}new ResizeObserver(resize).observe(container);resize();
  const clock=new THREE.Clock(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;let visible=true;document.addEventListener('visibilitychange',()=>visible=!document.hidden);
  function frame(){requestAnimationFrame(frame);if(!visible)return;const t=clock.getElapsedTime(),now=performance.now();
  if(actionPlaying){actionTime=Math.min(actionDuration,actionTime+Math.min(.1,(now-lastTick)/1000));if(actionTime>=actionDuration)actionPlaying=false;}lastTick=now;
  let acted=actionPreview?actionAt(actionTime):nodeAction(target.nodeNumber||11);
- if(target.storyboard==='setup'){if(!setupPaused)setupProgress=target.setupPhase==='overview'?0:target.setupPhase==='walking'?(reduced?1:Math.min(1,(now-setupStart)/4500)):1;const u=setupProgress;acted={...actionAt(0),sit:1,edge:1,stand:1,walk:!setupPaused&&target.setupPhase==='walking'&&u<1?.1:0,wash:0,setup:u};container.dataset.storyboard=target.setupPhase;container.dataset.walkProgress=u.toFixed(3);}
+ if(target.storyboard==='setup'){if(storyShot)setupProgress=storyShot.id==='overview'?0:storyShot.id==='walking'?(reduced?1:storyProgress):1;else if(!setupPaused)setupProgress=target.setupPhase==='overview'?0:target.setupPhase==='walking'?(reduced?1:Math.min(1,(now-setupStart)/4500)):1;const u=setupProgress;acted={...actionAt(0),sit:1,edge:1,stand:1,walk:target.setupPhase==='walking'&&u<1?.1:0,wash:0,setup:u};container.dataset.storyboard=target.setupPhase;container.dataset.walkProgress=u.toFixed(3);}
  if(actionPreview){updateActionUI(acted);document.querySelector('#scene-time').textContent=['06:55','06:57','07:00','07:02','07:05','07:10'][acted.stage];document.querySelector('#scene-stage').textContent='人物动作预演 · 非清醒识别结果';}else{container.dataset.actionStage='node';}
  const visual=actionPreview?{...target,day:acted.day,light:acted.light,curtain:acted.curtain}:target;
  bedBack.rotation.x=acted.bed*Math.PI/180;bedLink.scale.y=1+acted.bed/32;bedLink.position.y=.53+acted.bed/160;
- userAvatar.pose(acted,actionPreview?actionTime:t);partnerAvatar.pose({...acted,setup:undefined},t,true);userCover.visible=acted.edge<.1;
- for(const k of ['day','light','curtain'])current[k]=THREE.MathUtils.lerp(current[k],visual[k]??current[k],reduced?1:.035);
+ userAvatar.pose(acted,actionPreview?actionTime:target.storyboard==='setup'?storyProgress*(storyShot?.duration||0)/1000:t);partnerAvatar.pose({...acted,setup:undefined},t,true);userCover.visible=acted.edge<.1;
+ for(const k of ['day','light','curtain'])current[k]=target.storyboard==='setup'&&storyShot?(visual[k]??current[k]):THREE.MathUtils.lerp(current[k],visual[k]??current[k],reduced?1:.035);
+ container.dataset.light=current.light.toFixed(3);container.dataset.curtain=current.curtain.toFixed(3);
  sun.intensity=.8+current.day*3;skyMat.color.setRGB(.27+current.day*.35,.4+current.day*.3,.53+current.day*.25);beam.material.opacity=current.curtain*.11;
  curtains.forEach(({panel,side})=>{panel.position.z=-1.63+side*(.48+current.curtain*.6);panel.scale.z=1-current.curtain*.62;});
  lamps[1].light.intensity=.3+current.light*6;lamps[1].mat.emissiveIntensity=.2+current.light*3;lamps[0].light.intensity=.15;
@@ -136,9 +139,15 @@ export function createRoom(container,hotspots,onSelect){
 
  if(viewTarget){camera.position.lerp(new THREE.Vector3(...viewTarget.pos),reduced?1:.035);controls.target.lerp(new THREE.Vector3(...viewTarget.target),reduced?1:.035);if(camera.position.distanceTo(new THREE.Vector3(...viewTarget.pos))<.01)viewTarget=null;}
  controls.update();
- requestBubble.hidden=target.storyboard!=='setup'||target.setupPhase!=='request';
- if(!requestBubble.hidden){const p=new THREE.Vector3(1.25,2.16,-2.52).project(camera);requestBubble.style.left=Math.max(64,Math.min(container.clientWidth-70,(p.x*.5+.5)*container.clientWidth))+'px';requestBubble.style.top=Math.max(105,(-p.y*.5+.5)*container.clientHeight)+'px';requestBubble.classList.toggle('paused',setupPaused);}
+ requestBubble.hidden=target.storyboard!=='setup'||!storyShot?.bubble;
+ if(!requestBubble.hidden){const p=new THREE.Vector3(1.25,2.16,-2.52).project(camera);requestBubble.style.left=Math.max(86,Math.min(container.clientWidth*.55,(p.x*.5+.5)*container.clientWidth))+'px';requestBubble.style.top=Math.max(125,Math.min(container.clientHeight-135,(-p.y*.5+.5)*container.clientHeight))+'px';requestBubble.classList.toggle('paused',setupPaused);}
  for(const [index,item] of labels.entries()){const p=item.pos.clone().project(camera),x=(p.x*.5+.5)*container.clientWidth,y=(-p.y*.5+.5)*container.clientHeight;item.el.style.left=x+'px';item.el.style.top=(y-14)+'px';const offset=({speaker:[-22,-8],app:[22,14],curtain:[-18,6],radar:[18,-10]})[item.id]||[0,0];item.el.style.setProperty('--label-x',(x+offset[0])+'px');item.el.style.setProperty('--label-y',(y-14+offset[1])+'px');const setup=target.storyboard==='setup';item.el.hidden=setup?(index<legacyLabelCount||currentView!=='overview'||p.z>1||x<10||x>container.clientWidth-10||y<20||y>container.clientHeight-45):(index>=legacyLabelCount||p.z>1||x<42||x>container.clientWidth-42||y<145||y>container.clientHeight-120);if(setup&&index>=legacyLabelCount)item.el.classList.add('terminal-label');}renderer.render(scene,camera);
  }frame();
- return{pauseStoryboard(){setupPaused=true;viewTarget=null;},resumeStoryboard(){setupStart=performance.now()-setupProgress*4500;setupPaused=false;viewTarget=views[currentView];},setView(name){currentView=name;viewTarget=views[name]||views.overview;},setState(next){target=next;controls.minDistance=next.storyboard==='setup'?1.4:6;setupStart=performance.now();setupPaused=false;actionPlaying=false;actionPreview=false;motionUI.play.textContent='▷ 播放动作';motionUI.caption.textContent='动作预演 · 窗帘开启 / 靠背抬升 / 人物起身';motionUI.readout.textContent='34 秒 · 使用者侧靠背辅助已授权（模拟）';motionUI.seek.value=0;labels.forEach(l=>l.el.classList.toggle('active',next.active.includes(l.id)));}};
+ return{
+  setStoryboardProgress(shot,p){storyShot=shot;storyProgress=Math.max(0,Math.min(1,p));const u=reduced?1:storyProgress,e=u*u*(3-2*u);for(const k of ['light','curtain']){const range=shot[k]||[.03,.03];target[k]=range[0]+(range[1]-range[0])*e;}target.day=.14+target.curtain*.2;if(shot.bubble){requestBubble.textContent=dialogue[shot.voice]?.text||'正在描述需求';requestBubble.setAttribute('aria-label',requestBubble.textContent);}},
+  pauseStoryboard(){setupPaused=true;viewTarget=null;},
+  resumeStoryboard(){setupStart=performance.now()-setupProgress*4500;setupPaused=false;viewTarget=views[currentView];},
+  setView(name,instant=false){currentView=name;viewTarget=views[name]||views.overview;if(instant){camera.position.set(...viewTarget.pos);controls.target.set(...viewTarget.target);controls.update();viewTarget=null;}},
+  setState(next){target=next;storyShot=null;controls.minDistance=next.storyboard==='setup'?1.4:6;setupStart=performance.now();setupPaused=false;actionPlaying=false;actionPreview=false;motionUI.play.textContent='▷ 播放动作';motionUI.caption.textContent='动作预演 · 窗帘开启 / 靠背抬升 / 人物起身';motionUI.readout.textContent='34 秒 · 使用者侧靠背辅助已授权（模拟）';motionUI.seek.value=0;labels.forEach(l=>l.el.classList.toggle('active',next.active.includes(l.id)));}
+ };
 }

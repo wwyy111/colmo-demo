@@ -1,0 +1,91 @@
+/* Shared semantic motion, two visual treatments. Pure CSS, no external assets. */
+.butler{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:210px;border-radius:12px;background:#182c30;color:#ecf8ef;isolation:isolate;overflow:hidden}
+.butler-stage{position:relative;width:150px;height:142px;flex:none;--pace:3.2s;--span:.65;--gain:.55}
+.butler-stage span{position:absolute;display:block;transition:opacity .4s ease,background-color .4s ease,filter .4s ease}
+.butler-field{inset:15px -15px;border-radius:50%;background:radial-gradient(ellipse,#a1e3c933,transparent 65%);opacity:var(--gain);animation:butler-breathe var(--pace) ease-in-out infinite}
+.butler-spine{width:4px;height:62px;left:73px;top:38px;border-radius:8px;background:#e8fff4;box-shadow:0 0 10px #d5ffeeaa,0 0 30px #85d9b955;transform-origin:center;animation:butler-line var(--pace) ease-in-out infinite}
+.butler-pane{left:49px;top:34px;width:50px;height:70px;border:1px solid #d8ffef99;border-radius:7px;background:linear-gradient(115deg,#f0fff04d,#bce9dc0a);box-shadow:inset 1px 0 12px #e1fff322;opacity:0;transform:perspective(200px) rotateY(-24deg);animation:butler-glass var(--pace) ease-in-out infinite}
+.pane-one{translate:-17px -7px;animation-delay:-.6s}.pane-two{translate:0 0;animation-delay:-.3s}.pane-three{translate:17px 7px}
+.butler-signal{left:73px;top:113px;width:4px;height:4px;background:#bde8d2;border-radius:50%;opacity:.45}
+.butler-caption{position:relative;font-size:11px;letter-spacing:.06em;color:#d1e2d9;margin:0 0 14px;line-height:1.5}
+.butler[data-shape="glass"] .butler-pane{opacity:var(--gain)}
+.butler[data-shape="glass"] .butler-spine{opacity:0}
+.butler[data-state="idle"] .butler-stage{--span:.3;--gain:.32;--pace:4.5s}
+.butler[data-state="listening"] .butler-stage{--span:1;--gain:.85;--pace:1.8s}
+.butler[data-state="processing"] .butler-stage{--span:.7;--gain:.8;--pace:2s}
+.butler[data-state="processing"] .butler-field{animation:butler-process 2.4s ease-in-out infinite}
+.butler[data-state="processing"] .butler-signal{width:22px;left:64px;height:2px;animation:butler-line 1.6s ease-in-out infinite}
+.butler[data-state="speaking"] .butler-stage{--span:1;--gain:1;--pace:1.1s}
+.butler[data-state="speaking"] .butler-spine{animation:butler-speak 1.2s ease-in-out infinite}
+.butler[data-state="waiting"] .butler-stage{--span:.45;--gain:.4;--pace:4s}
+.butler[data-state="executing"] .butler-stage{--span:.8;--gain:.9;--pace:2.6s}
+.butler[data-state="executing"] .butler-field{background:radial-gradient(ellipse,#efdfab55,transparent 65%)}
+.butler[data-state="complete"] .butler-stage{--span:.6;--gain:.75;--pace:4.5s}
+.butler[data-state="complete"] .butler-signal{width:20px;height:2px;left:65px;opacity:1;box-shadow:0 0 9px #bde8d2}
+.butler-small{min-height:72px;height:72px;flex:none;background:none;overflow:visible}
+.butler-small .butler-stage{width:150px;height:142px;scale:.48;transform-origin:center;margin:-38px 0 -36px}
+.butler-small .butler-caption{margin:0;font-size:10px;text-shadow:0 1px 4px #061619}
+body:not(.demo-running) .butler:not(.reference-motion) .butler-stage span{animation-play-state:paused}
+@keyframes butler-breathe{0%,100%{transform:scale(.8)}50%{transform:scale(1.14)}}
+@keyframes butler-line{0%,100%{transform:scaleY(var(--span))}50%{transform:scaleY(calc(var(--span) + .2))}}
+@keyframes butler-speak{0%,100%{transform:scaleY(.65)}25%{transform:scaleY(1)}50%{transform:scaleY(.78)}75%{transform:scaleY(1.1)}}
+@keyframes butler-glass{0%,100%{transform:perspective(200px) rotateY(-24deg) translateY(3px)}50%{transform:perspective(200px) rotateY(-12deg) translateY(-3px)}}
+@keyframes butler-process{0%,100%{transform:scale(.7,1)}50%{transform:scale(1.3,.85)}}
+.avatar-state-picks{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.avatar-state-picks button{padding:6px 9px;border:1px solid #dce4df;border-radius:6px;background:#f8faf8;color:#4e655a;font-size:11px}
+.avatar-state-picks button.active{border-color:#789c8a;background:#e6efe9;color:#2e5141}
+#scene-options{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin:16px 0;color:#5a6c61;font-size:11px}
+#scene-options[hidden]{display:none}
+#scene-options label{display:flex;align-items:center;gap:6px}
+#scene-options select{max-width:145px;padding:5px 7px;border-radius:6px;border:1px solid #d4dfd7;background:#fafbf9;color:#334e3f;font-size:11px}
+#scene-options input{accent-color:#31584c}
+#materials{margin-left:auto;border:0;border-bottom:1px solid #abbeb1;border-radius:0;padding:4px 0;background:none;color:#426450;font-size:11px}
+.setup-time{font-size:28px;font-weight:600;letter-spacing:-.03em;margin-top:12px}
+.setup-time small{display:block;font-size:11px;font-weight:400;letter-spacing:0;color:#668071;margin-top:3px}
+.setup-card-note{color:#607568;font-size:12px;line-height:1.7;margin:12px 0 0;padding-top:10px;border-top:1px solid #e3eae5}
+.setup-card[data-tone="warning"]{border-color:#dccbb0;background:#fffdf8}
+.setup-card[data-tone="warning"] header>span{background:#f3e8d4;color:#786039}
+.setup-actions .preferred{background:#31584c;color:#fff;border-color:#31584c}
+.setup-actions .preferred:hover{background:#23483c}
+.setup-card-compact{box-shadow:0 5px 18px #10211d17;border:1px solid #ffffff90;border-radius:12px}
+.setup-card-compact .setup-time{font-size:23px;margin-top:8px}
+.setup-card-compact .setup-time small{font-size:10px}
+.setup-card-compact dl>div:nth-child(n){display:block}
+#scene-media{top:88px;bottom:116px;width:36%;max-width:310px;overflow:visible;align-items:stretch;gap:8px;pointer-events:none}
+.scene-card-fit{width:100%;position:relative;flex:none;min-height:0}
+.scene-card-inner{width:100%;transform-origin:top right}
+#scene-mode{position:absolute;left:16px;bottom:49px;z-index:4;color:#d0ded799;font-size:9px;pointer-events:none}
+#scene-subtitle{left:4%;right:4%;bottom:66px;font-size:12px;line-height:1.7}
+.room-frame .room-caption{bottom:104px;left:0;max-width:50%;font-size:9px}
+.room-frame .room-top h2{font-size:23px}
+.room-frame .room-top>div{width:65%}
+.room-frame .room-top p{font-size:12px;max-width:100%;line-height:1.6}
+.request-bubble{max-width:180px;width:29%;min-width:100px;padding:11px 13px;color:#355547;font-size:12px;line-height:1.65}
+.request-bubble:after{left:50%;transform:translateX(-50%)}
+.sound-blocked{outline:1px solid #e6ce92;background:#a07d3544!important}
+.room-frame:has(.sound-blocked) #demo-controls{opacity:1;pointer-events:auto}
+#setup-editor{display:grid;gap:16px;margin:22px 0}
+#setup-editor label{display:grid;gap:8px;font-size:13px}
+#setup-editor select{padding:12px;border:1px solid #ccd9d0;border-radius:8px;background:white;color:#304c3d}
+.audio-block audio,.setup-rules audio{width:100%;height:36px;margin-top:7px}
+.audio-block h4{font-size:13px}
+@media(max-width:600px){
+ .room-frame{height:540px!important}
+ #scene-media{width:46%;top:78px;bottom:110px;right:8px}
+ .room-frame .room-top{padding:16px}
+ .room-frame .room-top h2{font-size:19px}
+ .room-frame .room-top p{font-size:10px;max-width:170px}
+ .room-frame .camera,.room-frame:hover .camera{top:auto;bottom:42px;right:9px}
+ #scene-mode{bottom:78px;left:12px;font-size:8px}
+ #scene-subtitle{bottom:96px;font-size:11px}
+ #scene-media{bottom:140px}
+ .request-bubble{font-size:10px;padding:9px 10px;min-width:90px}
+ .room-frame .room-caption{display:none}
+ .setup-card-compact{padding:10px}
+ .setup-card-compact h4{font-size:12px}
+ .setup-card-compact dd{font-size:11px}
+ .setup-card-compact dt{font-size:10px}
+ #scene-options{gap:8px}
+ .terminal-label{font-size:9px!important;padding:3px 4px!important}
+}
+@media(prefers-reduced-motion:reduce){.butler-stage span{animation:none!important;transition:none!important}}
