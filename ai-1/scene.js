@@ -1,5 +1,6 @@
 import {createAvatar} from './avatar.js';
 import {dialogue} from './setup-dialogue.js';
+import {deviceStatuses} from './setup-narrative.js';
 import {actionAt,actionDuration,nodeAction} from './choreography.js';
 import * as THREE from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
@@ -43,8 +44,8 @@ export function createRoom(container,hotspots,onSelect){
  rounded(1.43,.11,1.05,.035,-2.26,.91,.49,m.blanket);
  const userCover=rounded(1.43,.11,.6,.035,-.73,.91,.72,m.blanket);
  const requestBubble=document.createElement('div');requestBubble.className='request-bubble';requestBubble.setAttribute('role','img');requestBubble.setAttribute('aria-label','用户正在描述需求');requestBubble.innerHTML='<span></span><span></span><span></span>';requestBubble.hidden=true;container.parentElement.append(requestBubble);
- const userAvatar=createAvatar(root);const partnerAvatar=createAvatar(root,{color:'#a49a8f',skin:'#bea28d'});
- const bedLink=cyl(.028,.028,.65,-.73,.53,-1.6,m.metal);bedLink.rotation.x=.35;
+ const userAvatar=createAvatar(root,{model:'Female'});const partnerAvatar=createAvatar(root,{model:'Male',color:'#a49a8f',skin:'#bea28d'});
+ const bedLink=cyl(.028,.028,.35,-.73,.36,-1.6,m.metal);bedLink.rotation.x=.35;
  rounded(2.4,.18,.61,.06,-1.48,.56,1.85,m.blanket);for(const x of [-2.43,-.53])for(const z of [1.65,2.03])cyl(.025,.025,.43,x,.26,z,m.metal);
  rounded(4.55,.025,4.15,.01,-1.46,.045,.11,m.rug);
  // Nightstands and independently controlled lamps; partner side stays dim.
@@ -67,8 +68,9 @@ export function createRoom(container,hotspots,onSelect){
  box(.035,2.65,2.15,-4.86,2.02,-1.63,m.dark);const skyMat=new THREE.MeshBasicMaterial({color:'#779bb5'});box(.045,2.47,1.99,-4.82,2.03,-1.63,skyMat);
  box(.06,.035,2,-4.775,2.03,-1.63,m.metal);box(.06,2.48,.035,-4.775,2.03,-1.63,m.metal);
  box(.28,.06,2.3,-4.72,.735,-1.63,m.stone);
- const curtains=[];for(const side of [-1,1]){const panel=new THREE.Group();root.add(panel);for(let i=0;i<12;i++){const wave=box(.085,2.85,.074,Math.sin(i*.8)*.025,0,(i-5.5)*.072,m.blanket,panel);wave.rotation.y=Math.sin(i*.8)*.2;}panel.position.set(-4.62,1.94,-1.63+side*.5);curtains.push({panel,side});}
- cyl(.014,.014,2.55,-4.6,3.39,-1.63,m.metal).rotation.x=Math.PI/2;
+ // Keep the fabric plane in front of the sill's inner edge (-4.58), including folds.
+ const curtains=[];for(const side of [-1,1]){const panel=new THREE.Group();root.add(panel);for(let i=0;i<12;i++){const wave=box(.085,2.85,.074,Math.sin(i*.8)*.025,0,(i-5.5)*.072,m.blanket,panel);wave.rotation.y=Math.sin(i*.8)*.2;}panel.position.set(-4.40,1.94,-1.63+side*.5);curtains.push({panel,side});}
+ cyl(.014,.014,2.55,-4.40,3.39,-1.63,m.metal).rotation.x=Math.PI/2;
  // A daylight patch remains subtle; the changing directional light supplies the room transition.
  const beam=new THREE.Mesh(new THREE.PlaneGeometry(3.3,1.7),new THREE.MeshBasicMaterial({color:'#efd8a8',transparent:true,opacity:.06,depthWrite:false}));beam.rotation.x=-Math.PI/2;beam.rotation.z=-.35;beam.position.set(-2.8,.022,-.45);root.add(beam);
  // HVAC and humidifier, with animated airflow and mist.
@@ -103,10 +105,11 @@ export function createRoom(container,hotspots,onSelect){
  const labelData=[['air','空调 · 新风',[-.55,3.32,-3.1]],['humidifier','加湿器',[-4.15,1.1,-.32]],['lamp','床侧柔光',[.62,1.42,-2.03]],['speaker','音箱 · 手表',[-3.5,1.1,-1.55]],['curtain','智能窗帘',[-4.62,2.7,-.7]],['water','主卫备水',[4.35,2.95,-1.9]]];
  // Configuration-specific terminals retain the original legacy labels.
  box(.18,.28,.035,-2.7,1.02,-1.6,m.dark);
- box(.025,.22,.27,-4.45,2.5,-2.3,m.pillow);
- const setupLabels=[['lamp','主 · 灯光',[.62,1.42,-2.03]],['curtain','主 · 窗帘',[-4.62,2.7,-.7]],['speaker','主 · 音箱',[-3.5,1.1,-1.55]],['bed','主 · 智能床',[-1.5,.75,.6]],['radar','主 · 毫米波雷达',[-4.45,2.5,-2.3]],['panel','辅 · 4寸中控屏',[1.1,1.55,-3.34]],['app','辅 · App（手机）',[-2.7,1.02,-1.6]]];
+ box(.27,.22,.025,-3.95,2.5,-3.32,m.pillow);
+ const setupLabels=[['lamp','主 · 灯光',[.62,1.42,-2.03]],['curtain','主 · 窗帘',[-4.40,2.7,-.7]],['speaker','主 · 音箱',[-3.5,1.1,-1.55]],['bed','主 · 智能床',[-1.5,.75,.6]],['radar','主 · 毫米波雷达',[-3.95,2.5,-3.32]],['panel','辅 · 4寸中控屏',[1.1,1.55,-3.34]],['app','辅 · App（手机）',[-2.7,1.02,-1.6]]];
  const legacyLabelCount=labelData.length;labelData.push(...setupLabels);
  const labels=labelData.map(([id,title,pos])=>{const el=document.createElement('button');el.className='hotspot';el.innerHTML='<i></i>'+title.replace(/^(主|辅) · /,'');el.title=title;el.onclick=()=>onSelect(id);hotspots.append(el);return{id,el,pos:new THREE.Vector3(...pos)};});
+ const deviceBadges=[['lamp','灯光',[.62,1.42,-2.03]],['curtain','窗帘',[-4.40,2.45,-1.3]]].map(([id,name,pos])=>{const el=document.createElement('span');el.className='device-state-badge';el.dataset.device=id;el.hidden=true;container.parentElement.append(el);return{id,name,el,pos:new THREE.Vector3(...pos)};});
  let actionTime=0,actionPlaying=false,actionPreview=false,lastTick=0,setupStart=performance.now(),setupProgress=1,setupPaused=false;
  const motionUI={play:document.querySelector('#action-play'),reset:document.querySelector('#action-reset'),seek:document.querySelector('#action-seek'),caption:document.querySelector('#action-caption'),readout:document.querySelector('#action-readout')};
  function updateActionUI(a){motionUI.seek.value=actionTime;motionUI.caption.textContent=a.label;motionUI.readout.textContent=`${Math.round(actionTime)} / ${actionDuration} 秒 · 靠背 ${Math.round(a.bed)}° · 窗帘 ${Math.round(a.curtain*100)}%`;motionUI.play.textContent=actionPlaying?'Ⅱ 暂停动作':'▷ 播放动作';container.dataset.actionStage=String(a.stage);container.dataset.actionTime=String(actionTime.toFixed(1));container.dataset.bedAngle=String(a.bed.toFixed(1));}
@@ -126,19 +129,25 @@ export function createRoom(container,hotspots,onSelect){
  if(target.storyboard==='setup'){if(storyShot)setupProgress=storyShot.id==='overview'?0:storyShot.id==='walking'?(reduced?1:storyProgress):1;else if(!setupPaused)setupProgress=target.setupPhase==='overview'?0:target.setupPhase==='walking'?(reduced?1:Math.min(1,(now-setupStart)/4500)):1;const u=setupProgress;acted={...actionAt(0),sit:1,edge:1,stand:1,walk:target.setupPhase==='walking'&&u<1?.1:0,wash:0,setup:u};container.dataset.storyboard=target.setupPhase;container.dataset.walkProgress=u.toFixed(3);}
  if(actionPreview){updateActionUI(acted);document.querySelector('#scene-time').textContent=['06:55','06:57','07:00','07:02','07:05','07:10'][acted.stage];document.querySelector('#scene-stage').textContent='人物动作预演 · 非清醒识别结果';}else{container.dataset.actionStage='node';}
  const visual=actionPreview?{...target,day:acted.day,light:acted.light,curtain:acted.curtain}:target;
- bedBack.rotation.x=acted.bed*Math.PI/180;bedLink.scale.y=1+acted.bed/32;bedLink.position.y=.53+acted.bed/160;
+ bedBack.rotation.x=acted.bed*Math.PI/180;bedLink.scale.y=1+acted.bed/64;bedLink.position.y=.36+acted.bed/320;
  userAvatar.pose(acted,actionPreview?actionTime:target.storyboard==='setup'?storyProgress*(storyShot?.duration||0)/1000:t);partnerAvatar.pose({...acted,setup:undefined},t,true);userCover.visible=acted.edge<.1;
  for(const k of ['day','light','curtain'])current[k]=target.storyboard==='setup'&&storyShot?(visual[k]??current[k]):THREE.MathUtils.lerp(current[k],visual[k]??current[k],reduced?1:.035);
  container.dataset.light=current.light.toFixed(3);container.dataset.curtain=current.curtain.toFixed(3);
  sun.intensity=.8+current.day*3;skyMat.color.setRGB(.27+current.day*.35,.4+current.day*.3,.53+current.day*.25);beam.material.opacity=current.curtain*.11;
  curtains.forEach(({panel,side})=>{panel.position.z=-1.63+side*(.48+current.curtain*.6);panel.scale.z=1-current.curtain*.62;});
- lamps[1].light.intensity=.3+current.light*6;lamps[1].mat.emissiveIntensity=.2+current.light*3;lamps[0].light.intensity=.15;
+ const setupLighting=target.storyboard==='setup';
+ lamps[1].light.intensity=setupLighting?current.light*18:.3+current.light*6;lamps[1].mat.emissiveIntensity=setupLighting?current.light*8:.2+current.light*3;lamps[0].light.intensity=.15;
  bathLight.intensity=target.active.includes('water')?2.2:.65;mirrorRing.material.emissiveIntensity=target.active.includes('water')?1.7:.5;
  airGroup.visible=Boolean(target.air);haze.forEach((p,i)=>{p.visible=Boolean(target.humidity);const f=reduced?i/9:(t*.27+i/9)%1;p.position.set(-4.15+Math.sin(i+t)*.05,.78+f*.7,-.32);p.material.opacity=.2*(1-f);});
  watchRing.visible=Boolean(target.haptic);watchRing.scale.setScalar(reduced?1:1+Math.sin(t*7)*.15);waterDots.forEach((p,i)=>{p.visible=Boolean(target.water);p.position.y=.3+(reduced?i/5:(t*.3+i/5)%1)*1.3;});pipeMat.color.set(target.danger?'#ee8b72':'#8dbecf');pipeMat.opacity=target.water?.8:.2;path.visible=target.active.includes('water');
 
  if(viewTarget){camera.position.lerp(new THREE.Vector3(...viewTarget.pos),reduced?1:.035);controls.target.lerp(new THREE.Vector3(...viewTarget.target),reduced?1:.035);if(camera.position.distanceTo(new THREE.Vector3(...viewTarget.pos))<.01)viewTarget=null;}
  controls.update();
+ const statuses=target.storyboard==='setup'?deviceStatuses(storyShot):{};
+ for(const badge of deviceBadges){const status=statuses[badge.id],p=badge.pos.clone().project(camera),w=container.clientWidth,h=container.clientHeight,x=(p.x*.5+.5)*w,y=(-p.y*.5+.5)*h;
+ badge.el.hidden=!status||p.z>1||p.z< -1||x<0||x>w||y<0||y>h;
+ if(!badge.el.hidden){badge.el.textContent=badge.name+' · '+status;badge.el.dataset.status=status;badge.el.style.left=Math.max(65,Math.min(w-65,x))+'px';badge.el.style.top=Math.max(155,Math.min(h-125,y))+'px';}
+ }
  requestBubble.hidden=target.storyboard!=='setup'||!storyShot?.bubble;
  if(!requestBubble.hidden){const p=new THREE.Vector3(1.25,2.16,-2.52).project(camera);requestBubble.style.left=Math.max(86,Math.min(container.clientWidth*.55,(p.x*.5+.5)*container.clientWidth))+'px';requestBubble.style.top=Math.max(125,Math.min(container.clientHeight-135,(-p.y*.5+.5)*container.clientHeight))+'px';requestBubble.classList.toggle('paused',setupPaused);}
  for(const [index,item] of labels.entries()){const p=item.pos.clone().project(camera),x=(p.x*.5+.5)*container.clientWidth,y=(-p.y*.5+.5)*container.clientHeight;item.el.style.left=x+'px';item.el.style.top=(y-14)+'px';const offset=({speaker:[-22,-8],app:[22,14],curtain:[-18,6],radar:[18,-10]})[item.id]||[0,0];item.el.style.setProperty('--label-x',(x+offset[0])+'px');item.el.style.setProperty('--label-y',(y-14+offset[1])+'px');const setup=target.storyboard==='setup';item.el.hidden=setup?(index<legacyLabelCount||currentView!=='overview'||p.z>1||x<10||x>container.clientWidth-10||y<20||y>container.clientHeight-45):(index>=legacyLabelCount||p.z>1||x<42||x>container.clientWidth-42||y<145||y>container.clientHeight-120);if(setup&&index>=legacyLabelCount)item.el.classList.add('terminal-label');}renderer.render(scene,camera);

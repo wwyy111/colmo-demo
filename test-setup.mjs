@@ -1,30 +1,32 @@
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {setupSequence,momentNames} from './ai-1/setup-storyboard.js';
-import {dialogue} from './ai-1/setup-dialogue.js';
+import {dialogue,matchingRecording,speechDuration} from './ai-1/setup-dialogue.js';
+import {explanationFor,deviceStatuses} from './ai-1/setup-narrative.js';
 import {cards,setupCard} from './ai-1/setup-cards.js';
-import {avatarStates,butler} from './ai-1/setup-avatar.js';
+import {avatarStates,butler,butlerPair} from './ai-1/setup-avatar.js';
 import {createPresentation} from './ai-1/presentation.js';
 const manifest=JSON.parse(readFileSync('ai-1/media/setup/manifest.json'));
 assert.equal(momentNames.length,4);
 for(const [id,clip] of Object.entries(dialogue)){
- assert.equal(manifest.voices[id].text,clip.text);
+ assert.equal(Boolean(matchingRecording(manifest,id)),manifest.voices[id].text===clip.text);
  assert.ok(existsSync('ai-1/media/setup/'+manifest.voices[id].file));
  assert.ok(manifest.voices[id].duration>0);
 }
 for(const effect of Object.values(manifest.effects))assert.ok(existsSync('ai-1/media/setup/'+effect.file));
-for(const branch of ['normal','missing','conditions','lightFailure','enableFailure','direct','stop','disabled']){
+for(const branch of ['normal','missing','conditions','lightFailure','direct','stop','disabled']){
  const shots=setupSequence(manifest,true,branch);
  assert.equal(new Set(shots.map(s=>s.id)).size,shots.length);
  for(const s of shots){
   assert.ok(s.duration>0&&s.moment>=0&&s.moment<4);
-  if(s.voice)assert.ok(s.duration>=manifest.voices[s.voice].duration);
+  if(s.voice)assert.ok(s.duration>=speechDuration(manifest,s.voice));
+  assert.ok(explanationFor(s).startsWith('AI '));
   if(s.card)assert.ok(cards[s.card]);
   if(s.effect)assert.ok(manifest.effects[s.effect]);
   assert.ok(avatarStates[s.state]);
   for(const key of ['light','curtain'])assert.ok(s[key].every(n=>n>=0&&n<=1));
  }
- if(['conditions','lightFailure','enableFailure'].includes(branch)){
+ if(['conditions','lightFailure'].includes(branch)){
   assert.equal(shots.filter(s=>s.effect==='exception').length,1);
   assert.ok(!shots.some(s=>s.state==='complete'||s.card==='enabled'));
  }
@@ -32,12 +34,23 @@ for(const branch of ['normal','missing','conditions','lightFailure','enableFailu
 const normal=setupSequence(manifest),byId=Object.fromEntries(normal.map(s=>[s.id,s]));
 assert.ok(byId.light.light[1]>byId.retryLight.light[1]);
 assert.ok(byId.light.duration<byId.retryLight.duration);
+assert.equal(deviceStatuses(byId.light).lamp,'渐亮中');
+assert.equal(deviceStatuses(byId.curtain).curtain,'开启中');
+assert.deepEqual(deviceStatuses(byId.enabled),{});
+assert.deepEqual(byId.retryDark.light,[0,0]);
+assert.ok(byId.retryDark.duration>=1000);
+assert.equal(byId.retryLight.light[0],0);
+assert.equal(normal[normal.indexOf(byId.retryLight)-1].id,'retryDark');
 assert.deepEqual(byId.curtain.curtain,byId.retryCurtain.curtain);
 assert.equal(byId.curtain.duration,byId.retryCurtain.duration);
 assert.ok(!setupSequence(manifest,false).some(s=>s.id.startsWith('retry')));
 assert.equal(cards.conditions.rows.length,3);
-for(const c of Object.keys(cards))assert.ok(setupCard(c,{compact:true}).includes('</article>'));
+for(const c of Object.keys(cards)){
+ if(['experienceLight','experienceCurtain','experienceEnd','retry','stopped','saving','missing','summaryClarified','disabled'].includes(c))assert.equal(setupCard(c,{compact:true}),'');
+ else assert.ok(setupCard(c,{compact:true}).includes('</article>'));
+}
 for(const shape of ['line','glass'])for(const state of Object.keys(avatarStates))assert.ok(butler(shape,state).includes(`data-state="${state}"`));
+for(const state of Object.keys(avatarStates))assert.equal((butlerPair(state,true).match(/data-state=/g)||[]).length,2);
 let now=0,nextId=0;const pending=new Map(),stages=[],stops=[];
 Object.defineProperty(globalThis,'performance',{value:{now:()=>now},configurable:true});
 globalThis.requestAnimationFrame=fn=>{pending.set(++nextId,fn);return nextId;};

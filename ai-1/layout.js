@@ -18,13 +18,22 @@ const observer=new ResizeObserver(()=>window.dispatchEvent(new Event('resize')))
 
 document.querySelector('#replay').innerHTML=icon('rotate-ccw')+'重演本时间点';
 document.querySelector('#competitor').innerHTML='竞品策略'+icon('arrow-up-right');
-document.querySelector('#catalog-button').innerHTML='全部交互'+icon('arrow-up-right');
 document.querySelector('[data-view="focus"]').innerHTML=icon('focus')+'聚焦';
 document.querySelector('#close-modal').innerHTML=icon('x');
 document.querySelector('.quiet-link').innerHTML='原版演示'+icon('arrow-up-right');
 document.querySelector('.basis summary span').innerHTML=icon('plus');
 const needs=document.querySelector('.task-context');
-needs.querySelector('summary').innerHTML='任务需求与用户痛点 '+icon('chevron-down');
-needs.addEventListener('mouseenter',()=>needs.open=true);
-needs.addEventListener('mouseleave',()=>{if(!needs.contains(document.activeElement))needs.open=false;});
-needs.addEventListener('focusout',e=>{if(!needs.contains(e.relatedTarget))needs.open=false;});
+const needsSummary=needs.querySelector('summary');
+needsSummary.innerHTML='任务需求与用户痛点 '+icon('chevron-down');
+const needsContent=document.createElement('section');
+needsContent.className='task-context-content';
+needsContent.append(...needs.querySelectorAll(':scope > div'));
+needs.append(needsContent);
+let needsCloseTimer;
+const openNeeds=()=>{clearTimeout(needsCloseTimer);needs.open=true;};
+needs.addEventListener('mouseenter',openNeeds);
+needs.addEventListener('mouseleave',()=>{needsCloseTimer=setTimeout(()=>{needs.open=false;},150);});
+needsSummary.addEventListener('focus',()=>{if(needsSummary.matches(':focus-visible'))openNeeds();});
+needs.addEventListener('focusout',e=>{if(!needs.contains(e.relatedTarget)&&!needs.matches(':hover'))needs.open=false;});
+needsSummary.addEventListener('click',e=>{if(matchMedia('(hover: hover)').matches&&e.detail>0){e.preventDefault();openNeeds();}});
+needs.addEventListener('keydown',e=>{if(e.key==='Escape'){clearTimeout(needsCloseTimer);needs.open=false;}});

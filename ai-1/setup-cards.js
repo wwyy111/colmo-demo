@@ -1,3 +1,4 @@
+import {adjustmentDiff} from './experience-details.js';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const cards={
  summary:{title:'我理解的需求',status:'整理需求',rows:[['时间','明早 07:00'],['优先方式','灯光渐亮，窗帘开一点'],['家庭要求','尽量不打扰伴侣']],note:'关联已授权的卧室设备'},
@@ -16,10 +17,11 @@ export const cards={
  missing:{title:'执行日期待确认',status:'需要补充',rows:[['还需明确','仅明天，还是每个工作日？']],actions:['仅明天','每个工作日'],note:'明确说出“明天”时不重复追问'},
  conditions:{title:'方案条件待确认',status:'3 项待处理',tone:'warning',rows:[['备用偏好','未明确其他备用方式，不擅自补全'],['免扰冲突','音箱与家庭规则冲突，暂不加入'],['设备不可用','手表暂不可用，完整方案暂不启用']],actions:['体验可用设备','调整方案','重新检查'],note:'先解决相关条件，再确认完整方案'},
  lightFailure:{title:'灯光未响应',status:'体验未完成',tone:'warning',rows:[['未完成项','卧室灯光效果尚未验证'],['受影响范围','不能确认当前方案可完整执行']],actions:['重新检查','调整方案','结束体验'],note:'不把未响应设备标记为成功'},
- enableFailure:{title:'方案尚未启用',status:'启用失败',tone:'warning',rows:[['当前结果','不能确认明早会按此方案执行'],['下一步','重试或返回调整方案']],actions:['重试','返回调整'],note:'失败时不使用完成音效'},
 };
+const artwork={summary:'01_唤醒方案_需求整理.svg',draft:'02_唤醒方案_待确认_修改后.svg',checking:'03_状态反馈控件_体验准备.svg',adjusted:'04_唤醒方案_已调整.svg',enabled:'05_唤醒方案_已启用.svg',conditions:'06_唤醒方案_条件待处理.svg',lightFailure:'07_状态反馈控件_体验异常_修改后.svg'};
 export function setupCard(id,{compact=false}={}){
- const c=cards[id];if(!c)return '';
+ const c=cards[id];if(!c||['experienceLight','experienceCurtain','experienceEnd','retry','stopped','saving','missing','summaryClarified','disabled'].includes(id))return '';
+ if(artwork[id])return `<article class="setup-card supplied-artwork ${compact?'setup-card-compact':''}" data-card="${id}" data-tone="${c.tone||'normal'}"><img width="${['checking','lightFailure'].includes(id)?2172:1448}" height="${['checking','lightFailure'].includes(id)?724:1086}" src="./media/setup/cards/${artwork[id]}" alt="${esc(c.title+'；'+c.status+'；'+c.rows.map(([k,v])=>k+'：'+v).join('；'))}">${id==='adjusted'?adjustmentDiff():''}</article>`;
  return `<article class="setup-card ${compact?'setup-card-compact':''}" data-card="${id}" data-tone="${c.tone||'normal'}"><header><h4>${esc(c.title)}</h4><span>${esc(c.status)}</span></header>${c.time?`<div class="setup-time">${c.time}<small>明天的目标起床时间</small></div>`:''}<dl>${c.rows.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>${!compact&&c.note?`<p class="setup-card-note">${esc(c.note)}</p>`:''}${!compact&&c.actions?`<div class="setup-actions">${c.actions.map((a,i)=>`<button ${i===0?'class="preferred"':''} data-setup-action="${esc(a)}">${esc(a)}</button>`).join('')}</div>`:''}</article>`;
 }
 export function deviceScope(){return `<details class="setup-rules"><summary>设备范围与免扰边界</summary><dl>${[

@@ -55,3 +55,11 @@
  .room-frame .camera,.room-frame:hover .camera{top:auto;bottom:48px;right:10px}
  .setup-card-compact dl>div:nth-child(n+2){display:none}
 }
+#channel-content>.supplied-artwork{width:92%;margin:16px auto}
+#channel-content .presentation-explanation{margin-top:18px}
+#channel-content .presentation-explanation p{line-height:1.75}
+#channel-content .presentation-explanation strong{font-weight:600;color:var(--ink)}
+.audio-section+ .audio-section{border-top:1px solid var(--line);margin-top:24px;padding-top:20px}
+.audio-section>h3{font-size:16px;margin:18px 0 8px}
+.audio-section .audio-block h4{font-size:14px}
+.audio-section audio{width:100%;max-width:100%}
