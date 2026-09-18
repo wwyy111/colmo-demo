@@ -84,7 +84,7 @@ export function createKitchen(container,hotspots,onSelect){
  const names={fridge:'智能冰箱',hood:'智能烟机',stove:'智能灶具',oven:'蒸烤一体机'};
  const labels=Object.entries(anchors).map(([id,pos])=>{const el=document.createElement('button');el.className='hotspot';el.innerHTML='<i></i>'+names[id];el.onclick=()=>onSelect(id);hotspots.appendChild(el);return{id,pos,el};});
  let currentState='welcome',targetView=null;
- const views={overview:{pos:[9,7.3,10.5],target:[0,1.25,0]},stove:{pos:[2.6,4.8,4.8],target:[-.35,1.6,-1.8]},island:{pos:[5.5,5.3,6.6],target:[.1,1.1,.7]}};
+ const views={overview:{pos:[9,7.3,10.5],target:[0,1.25,0]},fridge:{pos:[1,4,5.8],target:[-3.1,1.5,-2]},stove:{pos:[2.6,4.8,4.8],target:[-.35,1.6,-1.8]},island:{pos:[5.5,5.3,6.6],target:[.1,1.1,.7]}};
  function setView(name){targetView=views[name]||views.overview;}
  controls.addEventListener('start',()=>targetView=null);
  let pointerStart;renderer.domElement.addEventListener('pointerdown',e=>pointerStart=[e.clientX,e.clientY]);renderer.domElement.addEventListener('pointerup',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const r=renderer.domElement.getBoundingClientRect();const ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),camera);const hit=ray.intersectObjects(clickables)[0];if(hit)onSelect(hit.object.userData.device);});

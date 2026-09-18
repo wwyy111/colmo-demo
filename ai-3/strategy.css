@@ -1,0 +1,5 @@
+/* Layout and components are shared with ai-1; only cooking content details live here. */
+.cooking-story,.cooking-conditions{font-size:12px;color:var(--muted);margin:12px 0}
+.cooking-story p,.cooking-conditions p{font-size:13px;line-height:1.8;white-space:pre-line}
+#branches{flex-wrap:wrap}.cooking-conditions{flex-basis:100%;margin:4px 0}
+#competitor:disabled,#replay:disabled{opacity:.45;cursor:not-allowed}

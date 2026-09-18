@@ -1,3 +1,4 @@
+import {installCompetitors} from './competitors.js';
 import {crossfadeCard,installUIMotion} from './ui-motion.js';
 import {audioPresentation} from './audio-presentation.js';
 import {presentationNotes} from './presentation-notes.js';
@@ -111,6 +112,14 @@ function renderMoment(){
  const example=isExample(),m=currentMoments()[moment];
  const overview=momentOverview(example,moment,mode,m);
  $('#moment-overview').innerHTML=`<h3>${esc(overview.title)}</h3><dl><div><dt>用户</dt><dd>${esc(overview.user)}</dd></div><div><dt>AI</dt><dd>${esc(overview.ai)}</dd></div></dl>`;
+ const comparisonCard=example?(activeShot?.card||['summary','draft','checking','adjusted'][moment]):null;
+ const expressionDesign=[
+ '视觉：需求整理卡呈现时间、唤醒偏好和免扰要求，供用户核对。\n听觉：聆听用户表达；只对必要缺项追问。\n设备反馈：此时不执行灯光、窗帘或手表动作。',
+ '视觉：方案卡呈现目标时间、设备顺序、备用方式和免扰安排，提供体验、调整与确认入口。\n听觉：AI 简短说明推荐安排，邀请用户体验。\n设备反馈：确认体验前不执行。',
+ '视觉：准备阶段显示状态反馈控件；体验中通过灯光、窗帘实际变化及设备状态标表达进展。\n听觉：AI 提示体验开始，设备异常时解释问题和下一步；不逐台播报普通检查结果。\n触觉：本次不执行手表振动。',
+ '视觉：调整方案卡展示修改前后差异，启用后更新状态并保留调整、停用入口。\n听觉：AI 说明本次改动，保存成功后简短确认，并配合完成提示音。\n设备反馈：仅在用户再次体验时演示调整后的灯光与窗帘。'
+ ];
+ competitors.update({task,stage:Math.max(0,list().findIndex(n=>n.id===selected)),moment,mode,title:m.title,user:overview.user,ai:overview.ai,expression:example?(['normal','direct'].includes(mode)?expressionDesign[moment]:`${presentationNotes[comparisonCard]?.[1]||'通过语音与文字说明待处理的问题和下一步。'}\n异常分支的视听触表达待按节点进一步整理。`):'当前已整理交互逻辑；具体视觉、声音与设备表达待设计。',artwork:comparisonCard?setupCard(comparisonCard,{compact:true}):''});
  $('#timeline').querySelectorAll('button').forEach((b,i)=>{b.classList.toggle('active',i===moment);b.setAttribute('aria-pressed',String(i===moment));});
  $('#story-number').textContent=String(moment+1).padStart(2,'0');
  $('#user-story').textContent=example?mode==='normal'||mode==='direct'?(activeShot?.bubble?dialogue[activeShot.voice]?.text:m.story):'用户查看问题与受影响范围，选择补充、调整或暂不启用。':m.story;
@@ -248,10 +257,10 @@ $('#demo-restart').onclick=()=>{inspectTimepoint=false;startDemo();};
 $('#demo-sound').onclick=()=>{if(soundBlocked){muted=false;soundBlocked=false;if(presentation.running&&activeShot){const before=presentation.sequence.slice(0,presentation.sequence.indexOf(activeShot)).reduce((n,s)=>n+s.duration,0);playShotAudio(activeShot,presentation.elapsed-before);}else presentation.resume();}else muted=!muted;voiceAudio.muted=effectAudio.muted=muted;updatePlayer();};
 $('#replay').onclick=replayMoment;
 $('#next').onclick=()=>{if(moment<currentMoments().length-1){goMoment(moment+1);return;}const items=list(),i=items.findIndex(n=>n.id===selected);if(items[i+1])selectNode(items[i+1].id);else modal('<h2>已到本任务最后一个交互</h2><p>可以切换其他任务。</p>');};
-$('#competitor').onclick=()=>modal('<h2>竞品策略 · 初始化设置</h2><p>依据项目提供的《唤醒场景调研》：语音建场景、可编辑规则、设备测试和状态灯效已是参考基准。</p><h3>本方案重点</h3><p>从用户目标补全设备安排，解释关键理由；将设备响应检查与体感体验结合，按反馈定向修改，减少重复设置。</p><p class="source-note">调研未发现不等于品牌不具备；本演示展示设计目标，不宣称已验证产品优于竞品。</p>');
+const competitors=installCompetitors({pause:()=>{presentation.stop();silence();room?.pauseStoryboard?.();}});
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{room?.setView(b.dataset.view==='focus'?(isExample()?activeShot?.view||'setupInput':task===2?'bath':'bed'):b.dataset.view);document.querySelectorAll('[data-view]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b));});});
-function selectScene(i){presentation.stop();silence();$('#scene-title').textContent=scenes[i];$('#workspace').hidden=!!i;$('#empty-scene').hidden=!i;$('#scene-detail').hidden=!!i;$('#scenes').querySelectorAll('button').forEach((b,j)=>b.classList.toggle('active',i===j));if(!i)window.dispatchEvent(new Event('resize'));}
-$('#scenes').replaceChildren(...scenes.map((s,i)=>button(s+(i?' · 待完善':''),()=>selectScene(i),i===0)));$('#back-morning').onclick=()=>selectScene(0);
+function selectScene(i){presentation.stop();silence();if(i===2){location.href='../ai-3/strategy.html';return;}$('#scene-title').textContent=scenes[i];$('#workspace').hidden=!!i;$('#empty-scene').hidden=!i;$('#scene-detail').hidden=!!i;$('#scenes').querySelectorAll('button').forEach((b,j)=>b.classList.toggle('active',i===j));if(!i)window.dispatchEvent(new Event('resize'));}
+$('#scenes').replaceChildren(...scenes.map((s,i)=>button(s+(i&&i!==2?' · 待完善':''),()=>selectScene(i),i===0)));$('#back-morning').onclick=()=>selectScene(0);
 // Right-panel selection finishes the current timepoint before pausing.
 for(const event of ['pointerdown','click','keydown'])document.addEventListener(event,()=>{hasInteracted=true;},true);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)presentation.stop();});

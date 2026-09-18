@@ -1,0 +1,893 @@
+[
+  {
+    "name": "小艺管家｜华为",
+    "tone": "空间理解型场景管家\n官方表述：更懂家的 AI 语音",
+    "overview": "用户先用场景大师配置晨起时间与设备动作；到点以节律照明为核心进行环境唤醒。AI辅助康养传感器可持续检测睡眠/清醒，穿戴设备“出睡”可进入智慧生活场景链路，卧床过久可告警。",
+    "support": "明确的晨起场景\n可语音创建、编辑、查看\n\n官方支持较完整：晨起场景、节律照明、睡眠检测、出睡事件、卧床过久告警均有官方材料。 闭环程度：部分打通；已能识别“出睡/未起床”，但未见官方证明会依据实时清醒状态自动增强、减弱或停止本次唤醒。",
+    "nodes": [
+      {
+        "id": 0,
+        "title": "交互1｜生成无感唤醒初始方案",
+        "behavior": "初始化配置｜用户向场景大师说出场景名称、执行时间和设备动作（官方例：工作日 7:00 打开卧室灯）；场景大师生成场景，可继续语音编辑、查看。官方未显示其会自动汇总睡眠偏好或生成多阶段刺激强度策略。",
+        "trigger": "主动｜首次创建或修改晨起场景时，由用户在智慧生活 App、智能中控屏或小艺 App 中语音发起。",
+        "expression": "手机 App / 中控屏｜语音 + 视觉/文字｜小艺将自然语言转成场景规则并生成可查看的场景；可继续用语音修改、查询。",
+        "analysis": "自然语言高效建立/修改场景，需用户主动发起",
+        "row": 4
+      },
+      {
+        "id": 1,
+        "title": "交互2｜配置睡眠状态感知",
+        "behavior": "初始化配置｜在智慧生活 App 中配置床位、关怀对象并开启睡眠检测；AI辅助康养传感器以 4D 毫米波持续检测单床单人睡眠，形成入睡、出睡、清醒次数/时长、呼吸等状态数据。",
+        "trigger": "主动 + 被动｜用户一次性完成床位、关怀对象和检测开关配置后，传感器在夜间后台持续检测。",
+        "expression": "AI辅助康养传感器｜无感实体感知｜4D 毫米波检测微动与睡眠状态、无画面采集；智慧生活 App｜视觉 + 文字｜呈现睡眠状态与报告。",
+        "analysis": "传感器实时感知用户状态，\n用于异常告警，不用于调整策略",
+        "row": 5
+      },
+      {
+        "id": 2,
+        "title": "交互3｜判断启动并生成渐进唤醒策略",
+        "behavior": "行为动作｜到达用户已设定的晨起时间后执行场景；节律照明由 HarmonyOS AI 结合季节、时间、当前室内光线等条件计算自然节律光环境。官方未表明启动前会读取实时睡眠状态来决定跳过、延迟或改变本次唤醒。",
+        "trigger": "无感｜到达已配置时间后自动执行；节律光算法依据时间、季节与室内光线后台调整光环境。",
+        "expression": "智能灯｜实体灯效｜形成渐进、符合自然节律的晨间光环境；中控/App｜视觉｜场景可被查看或后续编辑，常规执行无需用户再次操作。",
+        "analysis": "触发条件以空间环境感知为主",
+        "row": 6
+      },
+      {
+        "id": 3,
+        "title": "交互4｜渐进执行并持续识别清醒状态",
+        "behavior": "行为动作｜晨起光环境可渐进执行；与此同时，AI辅助康养传感器能够持续记录睡眠、清醒与出睡状态。现有官方材料没有证明“检测到仍在睡/已清醒”会实时反馈给晨起场景，用于自动增强、减弱或停止本次唤醒。",
+        "trigger": "无感｜节律光照与睡眠检测均在后台进行；两者目前有明确官方能力，但官方未展示为实时反馈闭环。",
+        "expression": "智能灯｜实体灯效｜渐进改变光环境；AI辅助康养传感器｜无感感知｜持续识别睡眠/清醒；智慧生活 App｜视觉 + 文字｜查看相关状态或报告。",
+        "analysis": "同交互2",
+        "row": 7
+      },
+      {
+        "id": 4,
+        "title": "交互5｜检测出睡并触发醒后设备联动",
+        "behavior": "行为动作｜华为手表/手环的“出睡”可作为智慧生活场景条件。官方案例为：检测出睡后开启 Sound X 挥手检测窗口，用户挥手后触发开灯。说明“用户已醒”能够进入全屋自动化链路，但官方示例仍保留一次手势确认。",
+        "trigger": "无感 + 主动｜穿戴设备无感识别出睡；随后用户以挥手动作显式确认并触发设备任务。",
+        "expression": "手表/手环｜无感状态感知｜输出“出睡”事件；Sound X｜手势感知｜短时开启挥手检测；智能灯｜实体灯效｜完成醒后开灯。",
+        "analysis": "场景接续中保留轻量的用户主动性",
+        "row": 8
+      },
+      {
+        "id": 5,
+        "title": "交互6｜检测未起床异常并告警",
+        "behavior": "信息记录/异常检测｜AI辅助康养传感器在夜间看护时间结束后，若超过设定判定时间仍未起床，可上报“卧床过久”异常。该能力可作为“是否真正起床”的风险兜底，但官方定位为康养看护，并非晨起唤醒失败后的自动加强策略。",
+        "trigger": "无感 / 风险｜超过夜间看护结束时间且持续未起床，达到用户设定判定时间后自动上报异常。",
+        "expression": "AI辅助康养传感器｜无感感知｜检测持续卧床；智慧生活 App / 华为智慧生活微信服务号｜视觉 + 文字通知｜提示卧床过久异常。",
+        "analysis": "同交互2",
+        "row": 9
+      },
+      {
+        "id": 6,
+        "title": "交互7｜用户接管并调整晨起设备",
+        "behavior": "行为动作｜用户清醒后可继续通过小艺管家语音控制窗帘、播放歌单、调整全屋设备；AI音箱支持一次唤醒后的多轮持续对话和一句话下发两个指令。官方未展示“调弱/暂停整套晨起唤醒流程”的专用控制。",
+        "trigger": "主动｜用户清醒后通过语音提出调整、补充或设备控制需求。",
+        "expression": "AI音箱｜语音 + 听觉｜连续对话、音乐/天气等播报；窗帘、灯、空调等｜实体动作｜执行用户追加控制。",
+        "analysis": "同交互5",
+        "row": 10
+      },
+      {
+        "id": 7,
+        "title": "交互8｜复盘睡眠结果并按需编辑晨起场景",
+        "behavior": "信息记录/迭代｜AI辅助康养传感器生成包含入睡、出睡、清醒次数/时长、呼吸等睡眠报告；场景大师支持查看最近执行场景并语音修改晨起场景。官方未显示系统会依据多次“叫醒效果”自动学习并改写唤醒节奏。",
+        "trigger": "被动 + 主动｜系统次日生成睡眠报告；用户按需查看执行/睡眠结果，并主动修改晨起场景。",
+        "expression": "智慧生活 App｜视觉 + 文字｜睡眠报告与场景记录；小艺 App / 中控屏｜语音 + 视觉｜查询、编辑晨起场景。",
+        "analysis": "同交互1",
+        "row": 11
+      }
+    ],
+    "sources": [
+      {
+        "text": "https://consumer.huawei.com/cn/support/content/zh-cn16078533/?utm",
+        "excerpt": "创建场景：\n打开场景大师后，长按按住说话说出要创建的场景信息，即可完成场景创建。例如：\n创建一个晨起场景，工作日早上七点，打开卧室灯。",
+        "mediaNote": "直接证明晨起场景可由自然语言创建并继续编辑/查看。",
+        "mapping": "交互1、交互8",
+        "row": 15,
+        "images": [
+          {
+            "file": "./media/competitors/0-0.png",
+            "row": 15
+          },
+          {
+            "file": "./media/competitors/0-1.png",
+            "row": 15
+          }
+        ]
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/wholehome/intelligent-scenes/?utm",
+        "excerpt": "健康场景:\n节律照明，关爱你的生物钟\n清晨唤醒身体满满能量，午后营造小憩的慵懒氛围……HarmonyOS AI 引擎获取季节、时间、\n当前室内光线等多个条件后，借助节律照明算法分析，营造出符合自然节律的健康光照环境。",
+        "mediaNote": "直接证明晨起唤醒以节律光为核心，且光环境会结合多条件计算。",
+        "mapping": "交互3、交互4",
+        "row": 16,
+        "images": [
+          {
+            "file": "./media/competitors/0-2.png",
+            "row": 16
+          }
+        ]
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/support/content/zh-cn16005806/?utm",
+        "excerpt": "AI康养感知系统，是判断用户睡眠状态的重要依据",
+        "mediaNote": "",
+        "mapping": "",
+        "row": 17,
+        "images": []
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/support/content/zh-cn16005806/",
+        "excerpt": "传感器持续检测夜间睡眠状态与呼吸；睡眠报告包含入睡、出睡等。官方同时说明醒来后活动幅度过小可能仍被判为睡眠，连续翻身也可能被判为清醒。",
+        "mediaNote": "证明系统实际区分入睡/出睡/清醒，同时给出状态识别误差边界。",
+        "mapping": "交互4、交互8",
+        "row": 18,
+        "images": []
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/support/content/zh-cn16045391/",
+        "excerpt": "AI辅助康养传感器可把“已入睡且时长大于…”作为智慧生活场景条件，检测到入睡后可自动关闭灯光、音乐、空调。",
+        "mediaNote": "证明睡眠状态已经能进入全屋场景触发链路；该页是入睡场景，不等同于晨起闭环。",
+        "mapping": "交互2、交互4",
+        "row": 19,
+        "images": []
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/support/content/zh-cn16098156/",
+        "excerpt": "官方“睡醒后挥手开灯”案例：华为手表/手环的“出睡”事件先触发 Sound X 挥手检测窗口，随后用户挥手触发开灯；文档说明目前在售华为手表手环支持出睡检测。",
+        "mediaNote": "关键证据：‘已醒/出睡’可作为智慧生活场景条件进入设备联动。",
+        "mapping": "交互5",
+        "row": 20,
+        "images": []
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/support/content/zh-cn16002736/",
+        "excerpt": "夜间看护时间结束后，如果超过设定判定时间仍未起床，AI辅助康养传感器可上报“卧床过久”异常。",
+        "mediaNote": "证明系统可以对“仍未起床”做异常判定，但官方定位为康养看护。",
+        "mapping": "交互6",
+        "row": 21,
+        "images": []
+      },
+      {
+        "text": "https://consumer.huawei.com/cn/wholehome/ai-speaker-2e-new/",
+        "excerpt": "AI音箱 2e 全屋版官方示例包括定时叫醒、推荐歌单、窗帘控制；支持一次唤醒后的持续对话和一句话下发两个指令。",
+        "mediaNote": "证明晨起后的语音接管、多轮交互和追加设备控制能力。",
+        "mapping": "交互7",
+        "row": 22,
+        "images": []
+      }
+    ],
+    "images": []
+  },
+  {
+    "name": "小爱同学｜小米",
+    "tone": "生活化、音频化的生活助手\n官方表述：全新生活助手",
+    "overview": "晨起主要通过“小爱语音设置 + 米家 app 自动化配置”实现：用户可设置闹钟、音乐叫醒、贪睡及设备联动，系统按预设时间或条件执行。未找到小爱基于睡眠状态自动生成、动态调整整套晨起方案的明确官方依据。",
+    "support": "明确支持：闹钟、贪睡、天气播报、智能家居语音控制、Xiaomi Home 自动化。\n部分支持：用户可自行组合晨起联动；未检索到官方成套全屋晨起模板或自动学习优化。",
+    "nodes": [
+      {
+        "id": 0,
+        "title": "交互1｜配置晨起唤醒方案",
+        "behavior": "初始化配置｜用户通过语音明确起床时间和叫醒内容，例如指定“明早7点”“轻音乐/歌曲/自然声”；小爱创建对应闹钟。该方案由用户显式指定，并非 AI 根据睡眠状态自动生成。",
+        "trigger": "主动｜用户语音输入时间与内容偏好后发起设置。",
+        "expression": "小爱音箱/闹钟｜语音 + 听觉｜识别时间和叫醒内容，并以短句确认闹钟已设置；带屏/时钟设备显示闹钟时间或状态。",
+        "analysis": "自然语言高效建立/修改场景，需用户主动发起",
+        "row": 4
+      },
+      {
+        "id": 1,
+        "title": "交互2｜配置并激活晨起自动化",
+        "behavior": "初始化配置｜用户在米家 App 中进入自动化，设置触发条件（如固定时间，或人体移动、环境温湿度、照度及设备状态等）、重复周期和生效时段，再添加需要执行的设备动作并保存场景。晨起设备组合由用户自行配置。",
+        "trigger": "主动｜用户在 App 中手动创建或修改自动化规则。",
+        "expression": "Xiaomi Home App｜视觉 + 文字｜以“触发条件—设备动作—生效时段”的表单式界面完成配置；不呈现 AI 自动生成的晨起方案。",
+        "analysis": "设备组合完全由用户自主配置，未见ai生成/推荐方案",
+        "row": 5
+      },
+      {
+        "id": 2,
+        "title": "交互3｜按规则触发晨起任务",
+        "behavior": "行为动作｜到达已设闹钟时间时启动叫醒；若用户另建了 Xiaomi Home 定时/设备条件自动化，条件满足后对应设备自动执行。公开资料未证明系统会在触发前判断用户是否仍在睡眠或动态改写本次策略。",
+        "trigger": "无感｜定时或既有自动化条件满足后自动触发；无需用户当下再次操作。",
+        "expression": "闹钟/音箱｜听觉｜到时响铃或播放指定内容；关联设备｜视觉/实体状态｜按照预设动作开关或调节；通常不额外解释“为什么本次触发”。",
+        "analysis": "触发条件包括时间、传感器和设备状态等",
+        "row": 6
+      },
+      {
+        "id": 3,
+        "title": "交互4｜执行叫醒内容与设备动作",
+        "behavior": "行为动作｜闹钟按用户选择播放歌曲、歌手、类型、歌单或自然声；小爱智能闹钟的动态闹铃可叠加天气播报。若另行设置了同一时段的米家自动化，设备按既定动作执行，但未发现依据用户实时反应连续调整通道的官方机制。",
+        "trigger": "无感｜闹钟启动后按既定内容播放；米家设备按已配置动作执行。",
+        "expression": "小爱音箱/闹钟｜听觉 + 语音｜播放闹铃/音乐并可播报天气；灯具/空调等｜视觉/实体状态｜执行预设动作。整体表达偏“执行已设规则”，不是持续对话式引导。",
+        "analysis": "按照设定执行，未见根据用户实时状况动态调整",
+        "row": 7
+      },
+      {
+        "id": 4,
+        "title": "交互5｜贪睡或延后本次唤醒",
+        "behavior": "行为动作｜用户在闹钟响起后可说“我还想再睡十分钟”等指令，闹钟进入贪睡并在延后时间再次提醒。公开资料未证明该指令会同步顺延用户另外建立的 Xiaomi Home 自动化。",
+        "trigger": "主动｜用户在本次唤醒中通过语音提出延后/贪睡。",
+        "expression": "小爱闹钟/音箱｜语音 + 听觉｜识别“再睡十分钟”等意图并调整闹钟；到达新时间后再次响铃。",
+        "analysis": "同交互1",
+        "row": 8
+      },
+      {
+        "id": 5,
+        "title": "交互6｜语音调整晨起设备",
+        "behavior": "行为动作｜晨起过程中或醒来后，用户可通过小爱显式控制灯光、空调等已接入设备，例如调亮灯光或修改空调状态。该调整来自用户命令，不是系统根据清醒状态自动换法。",
+        "trigger": "主动｜用户语音发出设备控制指令。",
+        "expression": "小爱终端｜语音 + 听觉｜接收并反馈控制结果；智能设备｜视觉/实体状态｜执行亮度、开关、温度等变化。",
+        "analysis": "场景接续中保留轻量的用户主动性",
+        "row": 9
+      },
+      {
+        "id": 6,
+        "title": "交互7｜手动修改后续晨起规则",
+        "behavior": "迭代优化｜用户可回到 Xiaomi Home 修改触发条件、重复周期、生效时段与设备动作，也可重新设置闹钟内容。未检索到针对晨起结果的自动复盘、基于多次起床反应自动学习并改写规则的官方机制。",
+        "trigger": "主动｜用户根据体验自行进入 App 或语音重新设置。",
+        "expression": "Xiaomi Home App｜视觉 + 文字｜展示现有自动化并允许编辑；小爱终端｜语音｜重新设置闹钟。优化权主要掌握在用户手中。",
+        "analysis": "同交互2",
+        "row": 10
+      }
+    ],
+    "sources": [
+      {
+        "text": "小米商城｜小米小爱音箱 万能遥控版\nhttps://www.mi.com/aispeaker-control",
+        "excerpt": "关键原文：“明天早上7点叫我起床”；“明早7点用轻音乐叫我起床”。页面同时说明可语音控制家电。",
+        "mediaNote": "产品页含小爱音箱晨起闹钟、音乐叫醒与语音控家电的官方演示内容。",
+        "mapping": "交互1、交互4、交互6",
+        "row": 15,
+        "images": [
+          {
+            "file": "./media/competitors/1-0.png",
+            "row": 15
+          }
+        ]
+      },
+      {
+        "text": "小米商城｜小米小爱智能闹钟\nhttps://www.mi.com/mi-smartalarm",
+        "excerpt": "关键原文：“我还想再睡十分钟”。支持贪睡提醒。",
+        "mediaNote": "小爱智能闹钟官方产品图｜动态闹钟/贪睡",
+        "mapping": "交互1、交互4、交互5",
+        "row": 16,
+        "images": [
+          {
+            "file": "./media/competitors/1-1.png",
+            "row": 16
+          }
+        ]
+      },
+      {
+        "text": "小米全球支持｜What is Smart Scene on Mi Smart Home Hub?\nhttps://www.mi.com/global/support/article/KA-119868/",
+        "excerpt": "官方说明 Smart Scene 可依据 time of day、weather、sensor data、device status 等预设条件控制多个设备，并由用户在 Mi Home 中创建和管理。",
+        "mediaNote": "官方 Smart Scene 能力说明｜证明自动化是预设条件驱动，而非晨起状态的自主判断。",
+        "mapping": "交互2、交互3、交互7",
+        "row": 17,
+        "images": [
+          {
+            "file": "./media/competitors/1-2.png",
+            "row": 17
+          }
+        ]
+      },
+      {
+        "text": "小米全球支持｜How to set a smart scene for the Mijia Air Conditioner in the Xiaomi Home App?\nhttps://www.mi.com/global/support/faq/details/KA-660994/",
+        "excerpt": "官方流程包含 Automation → Add a trigger condition → Smart home devices / Schedule → Add action → Effective time period。",
+        "mediaNote": "Xiaomi Home 自动化配置界面｜显示用户手动添加触发条件、动作与生效时段。",
+        "mapping": "交互2、交互3、交互7",
+        "row": 18,
+        "images": [
+          {
+            "file": "./media/competitors/1-3.png",
+            "row": 18
+          },
+          {
+            "file": "./media/competitors/1-4.jpeg",
+            "row": 18
+          }
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "name": "Siri + HomePod ｜苹果",
+    "tone": "克制的系统型个人助理\n以模块化服务和状态反馈呈现",
+    "overview": "HomePod 可用晨间音乐或环境声叫醒，并回答天气、日历；家庭 App 可按特定时间、日出日落、位置或传感器运行自动化，且可为自动化添加 Siri 快捷指令。HomePod 顶部彩色指示灯表达聆听、思考、回应。",
+    "support": "闹钟 + 自动化组合\n需由用户配置",
+    "nodes": [
+      {
+        "id": 0,
+        "title": "交互 1｜生成无感唤醒初始方案",
+        "behavior": "初始化配置｜输入：用户通过 Siri 说出叫醒时间，或在“家庭”App 中新建 HomePod 闹钟并选择环境声、歌曲、播放列表、广播电台和音量。AI 判断：Siri 将语音中的时间解析为闹钟设置，系统按用户选择保存媒体与音量；官方资料未说明系统会自主判断更合适的叫醒方式。执行或接续结果：形成按指定时间执行的 HomePod 叫醒方案。",
+        "trigger": "主动｜用户通过 Siri 语音或“家庭”App 点击发起；在首次设置或修改闹钟时介入。",
+        "expression": "HomePod｜语音 + 听觉 + 灯效｜接收叫醒时间指令，五彩灯表示 Siri 正在聆听、思考或回应。iPhone/iPad“家庭”App｜视觉 + 文字 + 触控｜选择闹钟媒体、重复、随机和音量。",
+        "analysis": "",
+        "row": 5
+      },
+      {
+        "id": 1,
+        "title": "交互 2｜生成无感唤醒初始方案",
+        "behavior": "初始化配置｜输入：用户选择晨间需要联动的灯、百叶窗、HomePod 等配件及各自目标状态。AI 判断：“家庭”App 将用户选定的多个配件及状态组合为一个场景；官方资料未说明 Siri 会自主选择参与设备或执行顺序。执行或接续结果：生成可由用户运行或交给自动化触发的多设备场景。",
+        "trigger": "主动｜用户在“家庭”App 中创建自定义场景、添加配件并设置目标状态时介入。",
+        "expression": "iPhone/iPad“家庭”App｜视觉 + 文字 + 触控｜显示场景名称、参与配件和目标状态。HomePod、灯、百叶窗等｜听觉 + 视觉 + 环境变化｜作为用户选入场景的执行终端。",
+        "analysis": "",
+        "row": 6
+      },
+      {
+        "id": 2,
+        "title": "交互 3｜确认配置、联测并激活唤醒模板",
+        "behavior": "初始化配置｜输入：已经选定的场景配件、目标状态和自动化触发条件。AI 判断：“家庭”App 按配置生成可测试的场景或自动化，不评价方案是否适合唤醒。执行或接续结果：用户测试、修改并保存后，场景可直接运行，自动化可启用并等待触发。",
+        "trigger": "主动｜用户在“家庭”App 中测试、编辑、启用或停用场景与自动化时介入。",
+        "expression": "iPhone/iPad“家庭”App｜视觉 + 文字 + 触控｜展示场景和自动化配置，提供测试、增删配件、启用、停用和删除入口。关联配件｜视觉 + 环境变化｜在测试时执行设定状态。",
+        "analysis": "",
+        "row": 7
+      },
+      {
+        "id": 3,
+        "title": "交互 4｜判断启动并生成渐进唤醒策略",
+        "behavior": "行为动作（识别与触发）｜输入：特定时间、日出或日落时间，以及用户预先设置的重复日期和附加条件。AI 判断：系统核对当前是否满足预设触发条件；官方资料未说明系统会根据用户睡眠状态动态生成渐进策略。执行或接续结果：条件满足时运行既定自动化，条件不满足时不执行。",
+        "trigger": "被动 + 无感｜系统在后台等待特定时间或日出、日落条件；条件满足后自动介入，不额外说明 AI 正在参与。",
+        "expression": "HomePod 家居中枢｜后台联动｜在用户已配置自动化后负责触发关联配件。iPhone/iPad“家庭”App｜视觉 + 文字｜用于查看和修改触发时间、日期与配件。",
+        "analysis": "",
+        "row": 8
+      },
+      {
+        "id": 4,
+        "title": "交互 5｜判断启动并生成渐进唤醒策略",
+        "behavior": "行为动作（识别与触发）｜输入：用户位置变化、配件状态变化或传感器检测结果。AI 判断：系统核对事件是否符合用户设置的自动化条件；官方资料未说明这些输入会被用于判断用户是否清醒。执行或接续结果：满足条件时运行用户预设的配件动作。",
+        "trigger": "被动 + 无感｜系统在后台接收位置、配件或传感器状态；达到用户预设条件后自动介入。",
+        "expression": "HomePod 家居中枢｜后台联动｜接收自动化条件并连接配件。传感器与智能配件｜状态输入 + 环境变化｜提供触发状态，并在自动化启动后执行预设动作。",
+        "analysis": "",
+        "row": 9
+      },
+      {
+        "id": 5,
+        "title": "交互 6｜渐进执行并持续识别清醒状态（部分支持）",
+        "behavior": "行为动作（任务接续）｜输入：已保存的 HomePod 闹钟时间、媒体类型和音量。AI 判断：到时按既定闹钟设置执行；官方资料未说明 HomePod 会持续识别用户是否清醒，也未说明会根据反应逐级增强。执行或接续结果：播放铃声、环境声、歌曲、播放列表或广播电台，直到用户关闭或稍后提醒。",
+        "trigger": "无感（自动触发）｜到达用户设定的闹钟时间后自动开始播放；用户此前已主动完成设置。",
+        "expression": "HomePod｜听觉 + 灯效｜播放闹钟铃声、环境声或音乐；播放音频时顶部显示静态白光。",
+        "analysis": "",
+        "row": 10
+      },
+      {
+        "id": 6,
+        "title": "交互 7｜渐进执行并持续识别清醒状态（部分支持）",
+        "behavior": "行为动作（任务接续）｜输入：已启用的晨间场景或自动化，以及其中设定的 HomePod、灯、百叶窗等配件状态。AI 判断：系统依据既定条件调用多个配件；官方资料只证明早晨可以让多个设备同时工作，未证明分阶段渐进执行或持续识别清醒状态。执行或接续结果：HomePod 和关联配件按预设状态启动。",
+        "trigger": "无感｜到达指定时间或日出条件后，已启用的场景或自动化自动执行。",
+        "expression": "HomePod｜听觉｜播放场景中设置的音频。灯、百叶窗及其他智能配件｜视觉 + 环境变化｜按照场景设置同时开始工作。iPhone/iPad“家庭”App｜视觉 + 文字｜保留场景与配件控制入口。",
+        "analysis": "",
+        "row": 11
+      },
+      {
+        "id": 7,
+        "title": "交互 8｜调整或切换下一种唤醒方式（用户主动调整）",
+        "behavior": "行为动作（决策形成／任务接续）｜输入：用户说出“稍后提醒”“停止”或音量调整指令，或者触碰 HomePod 顶部。AI 判断：Siri 识别用户的显式控制意图；官方资料未说明系统会因未检测到清醒而自主切换唤醒方式。执行或接续结果：闹钟稍后再次响起、停止，或音频音量发生变化。",
+        "trigger": "主动｜闹钟响起期间，用户通过语音或触碰提出稍后提醒、停止或调节音量。",
+        "expression": "HomePod｜语音 + 听觉 + 实体触控 + 灯效｜接收用户指令；轻点顶部可关闭闹钟，加减按钮可调音量，五彩灯表示 Siri 正在处理请求。",
+        "analysis": "",
+        "row": 12
+      },
+      {
+        "id": 8,
+        "title": "交互 9｜处理异常、唤醒失败风险和用户接管（部分支持）",
+        "behavior": "信息记录／异常检测｜输入：用户通过 Siri 控制位于其他房间或无法直接看见状态的配件。AI 判断：系统判断该操作需要额外的执行反馈。执行或接续结果：HomePod 发出确认音效；用户也可用 Siri、“家庭”App 或实体触控继续调整和停止。官方资料未证明系统会检测“没有叫醒”并自动切换备用通道。",
+        "trigger": "主动｜用户发出设备控制、停止或调整指令后介入；确认音效随该次控制结果触发。",
+        "expression": "HomePod｜语音 + 听觉 + 灯效 + 实体触控｜Siri 接收指令，对难以直接观察状态的配件发出确认音效。iPhone/iPad“家庭”App｜视觉 + 触控｜允许用户查看和控制关联配件。",
+        "analysis": "",
+        "row": 13
+      },
+      {
+        "id": 9,
+        "title": "交互 10｜复盘唤醒结果与异常归因（未证实）",
+        "behavior": "官方资料未证实该交互节点的存在。",
+        "trigger": "/",
+        "expression": "/",
+        "analysis": "",
+        "row": 14
+      },
+      {
+        "id": 10,
+        "title": "交互 11｜形成并确认唤醒优化建议（未证实）",
+        "behavior": "官方资料未证实该交互节点的存在。",
+        "trigger": "/",
+        "expression": "/",
+        "analysis": "",
+        "row": 15
+      }
+    ],
+    "sources": [
+      {
+        "text": "HomePod 使用手册-首页｜https://support.apple.com/zh-cn/guide/homepod/apde8d540e2a/homepod",
+        "excerpt": "在 HomePod 上设定闹钟并用你喜爱的晨间音乐或者舒缓的环境声来叫你起床。若要保持一整天的好氛围，只需说：“Siri，播放一些正能量的音乐。”Apple Music 订阅可让你支配亿万首歌曲，还在 HomePod 上支持其他音乐服务。",
+        "mediaNote": "",
+        "mapping": "1，7",
+        "row": 21,
+        "images": []
+      },
+      {
+        "text": "HomePod 使用手册-使用闹钟、时钟和计时器｜https://support.apple.com/zh-cn/guide/homepod/apd82db5cb0d/homepod",
+        "excerpt": "- 用户可以通过 Siri 说“凌晨 5 点叫醒我”；\n- 可以使用铃声、环境声、歌曲、播放列表或广播电台；\n- 用户可以在家庭 App 中配置闹钟媒体、重复、随机播放和音量；\n- 可以使用 Siri 停止闹钟或稍后提醒。",
+        "mediaNote": "",
+        "mapping": 1,
+        "row": 22,
+        "images": []
+      },
+      {
+        "text": "HomePod 使用手册-在 HomePod 上控制你的家庭系统｜https://support.apple.com/zh-cn/guide/homepod/apd8085c1032/homepod",
+        "excerpt": "如果你有灯、恒温器和遮光帘等智能家居配件，HomePod 可担任家居中枢。你在家时可用语音控制这些配件，出门在外时可使用 iPhone、iPad、Mac 或 Apple Watch 上的“家庭” App 来控制。使用 HomePod 时，你可以让配件基于一天中的某个时间、你的位置或感应器等其他配件的操作自动触发。在 iPhone 或 iPad 上的“家庭” App 中设置这些配件后，配件会自动与 HomePod 上的 Siri 配合工作。",
+        "mediaNote": "",
+        "mapping": "8，9",
+        "row": 23,
+        "images": []
+      },
+      {
+        "text": "HomePod 使用手册-使用 HomePod 触碰控制｜https://support.apple.com/zh-cn/guide/homepod/apd7ba1aa325/homepod",
+        "excerpt": "- 轻点 HomePod 顶部可关闭闹钟；\n- 轻点可以暂停或恢复音频；\n- 顶部的加减按钮可以调整音量；\n- 按住顶部可以激活 Siri。",
+        "mediaNote": "",
+        "mapping": "8，9",
+        "row": 24,
+        "images": []
+      },
+      {
+        "text": "HomePod 使用手册-设置 Siri 并邀请他人使用 HomePod｜https://support.apple.com/zh-cn/guide/homepod/apd1841a8f81/homepod",
+        "excerpt": "使用 Siri 执行任务、回答问题和访问个性化内容。你可以设置语音识别，以便家中的每个人都可欣赏自己的音乐并提出个人请求。",
+        "mediaNote": "",
+        "mapping": "/",
+        "row": 25,
+        "images": []
+      },
+      {
+        "text": "识别 HomePod 和 HomePod mini 上的状态指示灯｜https://support.apple.com/zh-cn/101607",
+        "excerpt": "HomePod（第 2 代）和 HomePod mini 的顶部会显示指示灯，并根据你在 HomePod 扬声器上进行的操作而改变颜色。",
+        "mediaNote": "",
+        "mapping": "8，9",
+        "row": 26,
+        "images": [
+          {
+            "file": "./media/competitors/2-0.gif",
+            "row": 26
+          }
+        ]
+      },
+      {
+        "text": "iPhone 使用手册-在 iPhone 上的“家庭”中创建和使用场景｜https://support.apple.com/zh-cn/guide/iphone/iphb96e3f655/ios",
+        "excerpt": "- 一个场景可以同时控制多个配件；\n- 官方示例包括调节灯光、HomePod 播放音乐、拉上窗帘和调整温度；\n- 用户可以运行、编辑、测试场景，并增减配件。",
+        "mediaNote": "",
+        "mapping": 2,
+        "row": 27,
+        "images": []
+      },
+      {
+        "text": "iPhone 使用手册-在 iPhone 上的“家庭”中使用自动化｜https://support.apple.com/zh-cn/guide/iphone/iph6d50ec543/ios",
+        "excerpt": "在“家庭” App 中，你可以基于一天中的时间、你的位置、传感器的激活状态或配件的操作来运行自动化。你可以使用包括在“家庭” App 中的预配置自动化，或创建自己的自动化。",
+        "mediaNote": "",
+        "mapping": "1，3，4",
+        "row": 28,
+        "images": []
+      }
+    ],
+    "images": []
+  },
+  {
+    "name": "Gemini for Home｜Google",
+    "tone": "自然对话、过程可见的家庭助手\n",
+    "overview": "可设工作日循环闹钟；Google Home 可为卧室灯设定 wake light effects。智能音箱的灯效明确编码“被唤醒 / 聆听 / 思考 / 回应 / 无语音完成”等状态，具体灯位随硬件变化。",
+    "support": "自然描述需求，不要求设备级命令\n闹钟与自动化组件\n未检索到预置晨起模板\n",
+    "nodes": [
+      {
+        "id": 0,
+        "title": "交互1｜生成无感唤醒初始方案",
+        "behavior": "初始化配置｜用户可在 Google Home App 的 Help me create 中用自然语言描述自动化（官方例：每天早上 7:00 开灯），Gemini 生成包含 starter、condition、action 的自动化概览，用户检查、编辑后保存。高级 wake light 动作目前尚不支持由 Help me create / Ask Home 直接生成，需要在增强版 Automation 编辑器中配置。",
+        "trigger": "主动｜用户在 Google Home App 中通过语音或文字描述希望创建的晨间自动化，并确认保存。",
+        "expression": "Google Home App｜语音/文字 + 视觉｜Gemini 生成自动化概览，展示并允许编辑 starter、condition、action；用户确认后激活。",
+        "analysis": "自然语言高效建立/修改场景，需用户主动发起",
+        "row": 4
+      },
+      {
+        "id": 1,
+        "title": "交互2｜配置睡眠状态感知",
+        "behavior": "初始化配置｜Nest Hub（2nd gen）开启 Motion Sense / Sleep Sensing，用户设置常规睡觉与起床时间并校准睡眠位置；Soli 低功耗雷达检测运动和呼吸，设备还结合声音、光线、温度等信息形成睡眠结果。",
+        "trigger": "主动 + 被动｜用户一次性授权、设置睡眠日程并校准睡眠位置后，Nest Hub 在校准区域内自动准备并检测睡眠。",
+        "expression": "Nest Hub（2nd gen）｜无感雷达 + 环境传感｜Soli 感知运动/呼吸；屏幕｜视觉 + 文字｜显示 Sleep Sensing 状态、睡眠结果和隐私控制。",
+        "analysis": "无需佩戴设备，nest hub可通过雷达监测睡眠状态，但有个局限就是如果用户离设备过远或中间隔着宠物，就监测不到",
+        "row": 5
+      },
+      {
+        "id": 2,
+        "title": "交互3｜按时间/闹钟启动渐进唤醒",
+        "behavior": "行为动作｜Gentle Wake 可按指定时间启动，也可与同一房间音箱/显示屏上的晨间闹钟同步；灯光在约 30 分钟内逐渐变亮，模拟日出。2026 年 Automation 还新增了“Set smart bulb to wake”动作。",
+        "trigger": "无感｜到达设定时间，或与已设置的晨间闹钟同步后自动启动灯光渐亮。",
+        "expression": "智能灯｜实体灯效｜约 30 分钟持续渐亮；Nest/Google 音箱或显示屏｜听觉｜可承担晨间闹钟；Google Home App｜视觉｜配置相关自动化。",
+        "analysis": "根据用户状态与晨起时间做出交互判断",
+        "row": 6
+      },
+      {
+        "id": 3,
+        "title": "交互4｜渐进执行并持续识别清醒状态",
+        "behavior": "行为动作｜Gentle Wake 负责持续渐亮；Sleep Sensing 可识别用户何时醒来、何时最终离床，并记录 awake periods。两项能力同时存在，但当前官方 Automation starter/condition 列表未将 Sleep Sensing 的 awake / got out of bed 状态开放为自动化条件，因此没有官方证据证明唤醒会依据“仍在睡/已醒”自动改变强度或提前结束。",
+        "trigger": "无感｜灯光渐亮与 Sleep Sensing 均后台运行；当前证据显示二者属于并行链路，而非实时反馈闭环。",
+        "expression": "智能灯｜实体灯效｜渐进唤醒；Nest Hub（2nd gen）｜无感雷达 + 屏幕视觉｜持续感知并在睡眠结果中记录醒来、离床，但不直接控制本次 wake light 的收口。",
+        "analysis": "同理交互3",
+        "row": 7
+      },
+      {
+        "id": 4,
+        "title": "交互5｜执行晨间多设备与媒体动作",
+        "behavior": "行为动作｜Google Home Automation 可在晨间动作中追加开/关百叶或窗帘、调恒温器、启动咖啡机/智能插座、播放晨间歌单/新闻/广播、播报天气等，也支持在动作之间加入延时。具体可用能力取决于设备兼容性。",
+        "trigger": "无感 / 主动｜可由既有晨间自动化自动执行，也可由用户“Hey Google”指令即时触发。",
+        "expression": "窗帘/百叶、恒温器、咖啡机/插座｜实体动作｜执行晨间环境与设备任务；音箱/显示屏｜听觉 + 语音｜播放歌单、新闻或天气。",
+        "analysis": "同理交互3",
+        "row": 8
+      },
+      {
+        "id": 5,
+        "title": "交互6｜用户接管并调整闹钟/晨间动作",
+        "behavior": "行为动作｜Gemini for Home 支持设置重复闹钟并可语音 snooze；用户也可继续语音控制灯、媒体、咖啡机等。Automation 动作层支持停止灯效，但官方没有展示“检测未醒后自动换一种刺激方式”的闭环策略。",
+        "trigger": "主动｜用户在闹钟响起或晨间执行过程中，通过语音延后、停止或追加设备控制。",
+        "expression": "音箱/显示屏｜语音 + 听觉｜处理 snooze、闹钟与设备指令；智能灯/媒体设备｜实体灯效 + 听觉｜按用户接管结果调整。",
+        "analysis": "同理交互3",
+        "row": 9
+      },
+      {
+        "id": 6,
+        "title": "交互7｜复盘睡眠结果与醒来/离床状态",
+        "behavior": "信息记录｜Nest Hub 每天早晨可显示睡眠摘要，记录上床、入睡、醒来、最终离床、夜间起身以及 awake/light/deep/REM 等阶段；用户也可通过语音询问昨晚睡眠情况。",
+        "trigger": "被动 / 主动｜系统晨间生成摘要；用户可在 Nest Hub / Google Fit 查看，或主动用语音查询。",
+        "expression": "Nest Hub（2nd gen）｜视觉 + 文字｜呈现睡眠摘要与阶段；语音助手｜语音 + 听觉｜回答睡眠相关查询；Google Fit｜视觉｜查看历史趋势。",
+        "analysis": "场景接续中保留轻量的用户主动性",
+        "row": 10
+      },
+      {
+        "id": 7,
+        "title": "交互8｜形成个性化作息建议（不自动回写唤醒）",
+        "behavior": "迭代优化｜Sleep Sensing 持续积累睡眠模式后会提供个性化提示；连续约 14 天跟踪后可给出建议的入睡/起床时间。官方未说明这些建议会自动修改 Gentle Wake、闹钟或 Home Automation，仍需用户自行采用。",
+        "trigger": "被动 + 主动｜系统基于持续睡眠数据生成建议；用户查看后自行决定是否调整作息或晨起规则。",
+        "expression": "Nest Hub / Google Fit｜视觉 + 文字｜呈现个性化睡眠建议和推荐作息；Google Home App｜视觉 + 文字｜如要改变晨起自动化，仍需用户另行编辑。",
+        "analysis": "同理交互7",
+        "row": 11
+      }
+    ],
+    "sources": [
+      {
+        "text": "https://support.google.com/googlehome/answer/9304145?hl=en-SG&utm_",
+        "excerpt": "Help me create 允许用户在 Google Home App 中用语音或文字描述希望的自动化；Gemini 生成 automation overview，用户可编辑 starter、condition、action 后保存。官方示例含“每天早上 7 点开灯”。",
+        "mediaNote": "直接证明 Gemini for Home 可自然语言生成晨间时间型自动化。",
+        "mapping": "交互1",
+        "row": 15,
+        "images": [
+          {
+            "file": "./media/competitors/3-0.png",
+            "row": 15
+          }
+        ]
+      },
+      {
+        "text": "https://support.google.com/googlehome/answer/9304145?hl=en-419",
+        "excerpt": "Gentle Wake Up 会在约 30 分钟内逐步调亮灯光模拟日出；可按指定时间安排，也可以与同一房间音箱/显示屏上的晨间闹钟同步。",
+        "mediaNote": "直接证明渐进光唤醒的时间、持续方式与闹钟联动。",
+        "mapping": "交互3、交互4",
+        "row": 16,
+        "images": []
+      },
+      {
+        "text": "https://support.google.com/googlehome/answer/15684394?hl=en",
+        "excerpt": "新版 Home Automation 明确支持 wake light、窗帘/百叶、恒温器、咖啡机/智能插座、晨间歌单/新闻/天气、动作延时等；wake light 当前标注为尚不支持 Ask Home / Help me create。",
+        "mediaNote": "同时证明多设备晨间编排，以及 Gemini 自然语言入口与高级 wake light 之间的能力断点。",
+        "mapping": "交互1、交互3、交互5、交互6",
+        "row": 17,
+        "images": []
+      },
+      {
+        "text": "https://support.google.com/googlehome/answer/10357288?hl=en",
+        "excerpt": "Nest Hub（2nd gen）Sleep Sensing 使用低功耗雷达检测运动与呼吸，并结合声音、光线、温度等；睡眠结果记录入睡、醒来、最终离床、awake/light/deep/REM 等，并可形成个性化提示和推荐作息。",
+        "mediaNote": "证明 Google 能识别醒来/离床，但该睡眠状态在官方资料中主要用于睡眠报告与建议。",
+        "mapping": "交互2、交互4、交互7、交互8",
+        "row": 18,
+        "images": []
+      },
+      {
+        "text": "https://support.google.com/googlehome/answer/10388741?hl=en-419",
+        "excerpt": "Nest Hub（2nd gen）的 Motion Sense 由 Soli 低功耗雷达驱动，可检测呼吸、动作，并为 Sleep Sensing 提供基础；不是摄像头。",
+        "mediaNote": "补充说明睡眠感知硬件与无摄像头感知方式。",
+        "mapping": "交互2、交互4",
+        "row": 19,
+        "images": []
+      }
+    ],
+    "images": []
+  },
+  {
+    "name": "Bixby + SmartThings｜三星",
+    "tone": "低情绪、重效率的后台协同助理\n以例程自动化呈现服务",
+    "overview": "SmartThings 官方提供 Good Morning 例程：可由设定时间、动作传感器或 Galaxy Watch / Ring 的起床检测触发；示例包含模拟日出灯光、窗帘、早间新闻与咖啡机。用户也可在 Routines 中按“条件—动作”创建。",
+    "support": "明确的 Good Morning Routine\n可由时间、传感器或穿戴触发",
+    "nodes": [
+      {
+        "id": 0,
+        "title": "交互1｜配置晨起唤醒方案",
+        "behavior": "初始化配置｜用户可在 Routines 的 Discover 中选择 Gentle Wake Up 等预设，也可新建 Routine：设置 If 条件（时间、动作传感器、Galaxy 设备起床等）和 Then 动作（灯光、窗帘、TV、播放列表等）。方案主要由用户选择和编排，而非 Bixby 自动生成。",
+        "trigger": "主动｜用户进入 SmartThings 选择预设或手动创建 Routine。",
+        "expression": "SmartThings App｜视觉 + 文字｜用 If/Then 结构展示触发条件和动作，可逐项添加；AI/自动化表达偏结构化配置，不以对话方式解释方案。",
+        "analysis": "在APP中配置设备组合，也可选择系统预设，需要用户主动发起",
+        "row": 4
+      },
+      {
+        "id": 1,
+        "title": "交互2｜确认配置、联测并激活唤醒模板",
+        "behavior": "初始化配置｜完成条件与动作后，用户可点击 Test routine actions 测试实际设备动作，确认无误后 Save 并命名；保存后条件满足即自动执行。",
+        "trigger": "主动｜用户主动测试、确认并保存 Routine。",
+        "expression": "SmartThings App｜视觉 + 文字｜提供“Test routine actions”和 Save；关联设备｜视觉/实体状态｜测试时实际响应，用真实动作验证配置。",
+        "analysis": "配置后提供测试验证，并保存",
+        "row": 5
+      },
+      {
+        "id": 2,
+        "title": "交互3｜判断启动并触发 Good Morning Routine",
+        "behavior": "行为动作｜Routine 可由设定时间、动作传感器，或 Galaxy Watch/Ring 检测到用户已醒来后触发。与 Samsung Health 集成后可基于实际睡眠/起床时间执行已配置动作；公开材料未表明触发时会重新生成新的晨起策略。",
+        "trigger": "被动｜穿戴设备/传感器持续提供状态；无感｜满足时间、动作或起床条件后自动触发。",
+        "expression": "Galaxy Watch/Ring｜传感 + 状态输入｜提供起床检测；SmartThings｜后台自动化｜匹配 If 条件并启动 Routine，通常不先弹出确认。",
+        "analysis": "触发条件包括时间，传感器数据和穿戴设备",
+        "row": 6
+      },
+      {
+        "id": 3,
+        "title": "交互4｜渐进执行晨起设备动作",
+        "behavior": "行为动作｜官方 Good Morning 示例中，Philips Hue 灯逐渐变亮模拟日出，Somfy 窗帘升起，Samsung TV Plus 自动播放本地早间新闻，Eve Smart Plug 为咖啡壶供电。动作按既定 Routine 联动执行。",
+        "trigger": "无感｜Routine 触发后，多设备按预设动作自动执行。",
+        "expression": "灯具｜视觉｜渐亮模拟日出；窗帘｜实体动作｜自动打开；TV｜视觉 + 听觉｜播放早间新闻；插座/咖啡设备｜实体状态｜自动通电。整体以环境变化表达服务，语音存在感较低。",
+        "analysis": "按照设定执行，未见根据用户实时状况动态调整",
+        "row": 7
+      },
+      {
+        "id": 4,
+        "title": "交互5｜Bixby语音调用或调整晨起场景",
+        "behavior": "行为动作｜用户可通过 Bixby 显式调用 Good Morning mode，或直接说“打开百叶窗”等 SmartThings 控制命令，对晨起环境进行即时接管和调整。",
+        "trigger": "主动｜用户语音唤醒 Bixby 并发出场景/设备控制命令。",
+        "expression": "Bixby 终端｜语音 + 听觉｜识别并执行“Good Morning mode”或设备指令；设备｜视觉/实体状态｜按指令变化。表达简短、任务导向。",
+        "analysis": "场景接续中保留轻量的用户主动性",
+        "row": 8
+      },
+      {
+        "id": 5,
+        "title": "交互6｜查看睡眠环境与晨间摘要",
+        "behavior": "信息记录｜SmartThings/Samsung Health 的 Sleep environment report 汇总前一晚温度、湿度、CO₂、照度等环境信息，并给出个性化改善建议。该报告是睡眠环境复盘，不等同于验证“Good Morning Routine 是否成功把用户叫醒”。",
+        "trigger": "被动/按需｜系统在前一晚产生数据；用户晨起后查看报告或 Morning Insight。",
+        "expression": "Galaxy 手机｜视觉 + 文字｜以 Sleep environment report / Morning Insight 卡片呈现环境数据、偏差和改善建议；表达偏信息摘要与建议。",
+        "analysis": "AI汇总夜间环境信息并复盘，给出建议；不进行晨间唤醒的复盘",
+        "row": 9
+      },
+      {
+        "id": 6,
+        "title": "交互7｜手动调整后续 Routine",
+        "behavior": "迭代优化｜用户可根据晨起体验或睡眠环境报告修改 If 条件、Then 动作和设备组合。官方强调 Routine 可自定义；未找到材料证明系统会依据多次晨起结果自动改写 Good Morning Routine。",
+        "trigger": "主动｜用户进入 SmartThings 编辑 Routine。",
+        "expression": "SmartThings App｜视觉 + 文字｜保留原 Routine 结构并允许编辑；优化以用户控制为主，系统提供数据/建议而非静默改写规则。",
+        "analysis": "同交互1",
+        "row": 10
+      }
+    ],
+    "sources": [
+      {
+        "text": "Samsung US Newsroom｜Lights, Coffee, Action: Routines That Work For You\nhttps://news.samsung.com/us/samsung-smartthings-lights-coffee-action-routines-that-work-for-you/\n",
+        "excerpt": "关键原文：Good Morning 可由 set time、motion sensor、Galaxy Watch/Ring 检测起床触发；灯光渐亮、窗帘打开、TV 新闻、咖啡设备联动。",
+        "mediaNote": "官方 Good Morning 场景总览｜完整支撑触发方式、设备组合与环境式表达。",
+        "mapping": "交互1、交互3、交互4、交互7",
+        "row": 15,
+        "images": [
+          {
+            "file": "./media/competitors/4-0.png",
+            "row": 15
+          }
+        ]
+      },
+      {
+        "text": "三星 Global Newsroom｜IFA 2022 SmartThings 未来之家线上导览\nhttps://news.samsung.com/global/ifa2022-samsung-town-2-do-the-smartthings-the-online-tour-of-the-future-home?utm_source=chatgpt.com",
+        "excerpt": "Good Morning Mode 启动后，窗帘自动打开、灯光自动开启；空调切换至自动模式，The Frame TV 也会自动开启并显示照片，让用户更自然地进入晨间状态。",
+        "mediaNote": "官方晨起场景展示",
+        "mapping": "交互4",
+        "row": 16,
+        "images": [
+          {
+            "file": "./media/competitors/4-1.png",
+            "row": 16
+          }
+        ]
+      },
+      {
+        "text": "Samsung Support｜Use automations in SmartThings\nhttps://www.samsung.com/us/support/answer/ANS10002640/",
+        "excerpt": "官方配置步骤：Create routine → If → Then → Test routine actions → Save；条件满足后设备自动执行。",
+        "mediaNote": "SmartThings Routine 配置/联测流程｜用户可在保存前测试实际动作。",
+        "mapping": "交互1、交互2、交互3、交互7",
+        "row": 17,
+        "images": [
+          {
+            "file": "./media/competitors/4-2.png",
+            "row": 17
+          }
+        ]
+      },
+      {
+        "text": "Samsung Global Newsroom｜Samsung Announces Latest SmartThings Update\nhttps://news.samsung.com/global/samsung-announces-latest-smartthings-update",
+        "excerpt": "官方说明与 Galaxy Watch/Ring 配合后，可根据实际 sleep/wake time 自动调节环境；早晨例程可打开窗帘并播放音乐。",
+        "mediaNote": "SmartThings Routine 设置界面｜清楚显示 If=Sleep/When you wake up、Then=TV、Test routine actions。",
+        "mapping": "交互2、交互3",
+        "row": 18,
+        "images": [
+          {
+            "file": "./media/competitors/4-3.png",
+            "row": 18
+          },
+          {
+            "file": "./media/competitors/4-4.png",
+            "row": 18
+          },
+          {
+            "file": "./media/competitors/4-5.png",
+            "row": 18
+          }
+        ]
+      },
+      {
+        "text": "Samsung Global Newsroom｜Sleep environment report / Morning Insight\nhttps://news.samsung.com/global/samsung-announces-latest-smartthings-update",
+        "excerpt": "官方说明睡眠环境报告汇总温湿度、CO₂、照度等，并提供 personalized suggestions for improvement。",
+        "mediaNote": "Morning Insight + Sleep environment report 官方界面｜晨后信息摘要与改善建议的视觉表现。",
+        "mapping": "交互6、交互7",
+        "row": 19,
+        "images": [
+          {
+            "file": "./media/competitors/4-6.png",
+            "row": 19
+          }
+        ]
+      },
+      {
+        "text": "Samsung Korea｜Bixby User Guide\nhttps://www.samsung.com/sec/apps/bixby/bixby-user-guide/",
+        "excerpt": "SmartThings 控制示例包括：“블라인드 열어줘”（打开百叶窗）、“좋은 아침 모드 실행해줘”（执行 Good Morning mode）。",
+        "mediaNote": "Bixby 官方指令示例｜证明 Bixby 是 SmartThings 场景/设备的语音调用入口。",
+        "mapping": "交互5",
+        "row": 20,
+        "images": [
+          {
+            "file": "./media/competitors/4-7.png",
+            "row": 20
+          }
+        ]
+      }
+    ],
+    "images": []
+  },
+  {
+    "name": "ThinQ ON｜LG",
+    "tone": "照料、服务导向的家电协同中枢\n官方核心概念：Affectionate Intelligence",
+    "overview": "ThinQ ON 被定位为 AI 家居中枢，可用自然、对话式语音控制设备与服务，理解偏好并长期个性化；官方也描述了可配置自动化例程、在任务完成或发现问题时主动告知。当前材料未直接证明其已提供明确的“晨起叫醒 + 全屋联动”成套功能。",
+    "support": "可配置例程与语音控制\n未检索到当前明确的晨起模板",
+    "nodes": [
+      {
+        "id": 0,
+        "title": "交互 1｜生成无感唤醒初始方案",
+        "behavior": "初始化配置｜输入：用户连接的 LG/第三方设备、房间信息、已配置例程、语音表达及历史使用偏好。AI 判断：理解对话上下文与各设备偏好，判断哪些设备可编入晨间例程。执行或接续结果：保存或修改多设备自动化例程；官方未说明可自动生成完整的“无感唤醒方案”。",
+        "trigger": "主动｜用户在 ThinQ App 中连接设备、配置例程，或用自然语言提出晨间需求；保存设置时介入。",
+        "expression": "ThinQ App｜视觉 + 文字｜显示设备、房间和例程设置；ThinQ ON｜语音 + 听觉｜理解自然语言并回应。完整唤醒方案生成界面未证实。",
+        "analysis": "",
+        "row": 5
+      },
+      {
+        "id": 1,
+        "title": "交互 2｜确认配置、联测并激活唤醒模板",
+        "behavior": "初始化配置｜输入：Matter、Wi‑Fi、Thread 连接状态、设备能力、授权与例程设置。AI 判断：识别可管理设备及可执行设置。执行或接续结果：用户用语音或 App 检查、修改设置并启用例程；官方未说明专用晨起模板或一键联测。",
+        "trigger": "主动｜用户查看设备连接与能力、修改设置并启用例程；仅在设备已连接且授权有效时执行。",
+        "expression": "ThinQ App｜视觉 + 文字｜呈现连接设备和可改设置；ThinQ ON｜语音 + 听觉｜查询或更改设备设置。专用联测反馈未证实。",
+        "analysis": "",
+        "row": 6
+      },
+      {
+        "id": 2,
+        "title": "交互 3｜判断启动并生成渐进唤醒策略",
+        "behavior": "行为动作（识别与触发／决策形成）｜输入：已学习的生活模式及占用、温湿度等环境信息。AI 判断：CES 概念演示中，系统检测到用户开始工作日并匹配个人偏好。执行或接续结果：自动调整照明、温度和湿度；官方未说明从睡眠中识别清醒或生成渐进叫醒策略。",
+        "trigger": "无感｜在既有生活模式和传感信息满足条件时自动介入；“检测到开始工作日”为 CES 概念演示，并非已证实的清醒识别。",
+        "expression": "环境/占用传感器｜环境感知｜提供占用、温度、湿度、空气质量等信息；灯光/空调/湿度设备｜实体环境变化｜按偏好调整。",
+        "analysis": "",
+        "row": 7
+      },
+      {
+        "id": 3,
+        "title": "交互 4｜渐进执行并持续识别清醒状态",
+        "behavior": "行为动作（任务接续／终止条件）｜输入：已启动例程及连接设备的执行状态。AI 判断：按例程协调多设备，并监测任务是否完成或出现问题。执行或接续结果：设备联动，ThinQ ON 播报或通知状态；未见逐级增强刺激或连续识别清醒状态的官方说明。",
+        "trigger": "无感｜例程启动后在后台协调设备并监测执行状态；任务完成或检测到问题时才显性告知。",
+        "expression": "连接设备｜实体动作 + 灯效/听觉等设备原生通道｜执行自动化例程；ThinQ ON/手机｜语音或文字｜在任务完成或异常时告知。",
+        "analysis": "",
+        "row": 8
+      },
+      {
+        "id": 4,
+        "title": "交互 5｜调整或切换下一种唤醒方式",
+        "behavior": "行为动作（决策形成／任务接续）｜输入：用户新的自然语言指令、设备状态与已知偏好。AI 判断：结合对话上下文，判断应调整的设备与参数。执行或接续结果：修改照明、温湿度、音频等可用设置并继续例程；“根据未醒状态自动切换唤醒方式”未获证实。",
+        "trigger": "主动｜用户在执行中用语音或 App 提出新的要求；系统理解上下文后即时调整。自动因“未醒”切换未证实。",
+        "expression": "ThinQ ON｜语音 + 听觉｜接收自然语言并进行对话式回应；连接设备｜实体动作/多模态｜改变可用设置并延续场景。",
+        "analysis": "",
+        "row": 9
+      },
+      {
+        "id": 5,
+        "title": "交互 6｜处理异常、唤醒失败风险和用户接管",
+        "behavior": "信息记录／异常检测｜输入：智能家居设备的运行状态、任务完成信息与故障信号。AI 判断：自主监测生态系统，识别任务已完成或检测到问题。执行或接续结果：通过音箱语音或 App 通知用户，用户可再用语音/App 接管；官方未说明针对“叫不醒”的升级策略。",
+        "trigger": "被动 + 主动｜系统后台监测任务完成与异常并主动通知；用户收到通知后可通过语音或 App 接管。",
+        "expression": "ThinQ ON｜听觉 + 语音｜播报任务完成或异常；ThinQ App｜视觉 + 文字｜显示状态/通知并提供人工控制入口。",
+        "analysis": "",
+        "row": 10
+      },
+      {
+        "id": 6,
+        "title": "交互 7｜复盘唤醒结果与异常归因",
+        "behavior": "迭代优化（回顾）｜输入：个人使用模式与总体使用趋势。AI 判断：持续学习偏好，以个性化日常设备体验。执行或接续结果：为后续设备控制和例程提供偏好依据；官方未说明生成单次晨起结果报告或异常归因。",
+        "trigger": "被动｜系统在长期使用中持续学习个人与总体使用模式；未见单次晨起结束后自动复盘的明确时点。",
+        "expression": "ThinQ ON／AI Home｜后台学习｜官方描述持续学习使用模式；面向用户的单次晨起复盘卡片、指标或归因界面未证实。",
+        "analysis": "",
+        "row": 11
+      },
+      {
+        "id": 7,
+        "title": "交互 8｜形成并确认唤醒优化建议",
+        "behavior": "迭代优化（自主修正）｜输入：长期使用偏好、可用设备及后续功能更新。AI 判断：依据已学习偏好选择更合适的设备设置。执行或接续结果：后续体验持续个性化，用户可修改设置或例程；官方未说明主动提出并要求确认“唤醒优化建议”。",
+        "trigger": "被动 + 主动｜系统长期学习用于后续个性化；用户主动修改例程或设备设置。自动推送唤醒优化建议未证实。",
+        "expression": "ThinQ App｜视觉 + 文字｜用户可修改设置和例程；ThinQ ON｜语音 + 听觉｜可用对话调整设备。系统主动呈现唤醒优化建议未证实。",
+        "analysis": "",
+        "row": 12
+      }
+    ],
+    "sources": [
+      {
+        "text": "LG Global Newsroom｜LG Opens New Chapter in Connected Home Living With “ThinQ ON” AI Home Hub at IFA 2024\n https://www.lg.com/global/newsroom/news/home-appliance-solution/lg-opens-new-chapter-in-connected-home-living-with-thinq-on-ai-home-hub-at-ifa-2024/",
+        "excerpt": "“continuously learns from individual usage patterns”｜官方同时说明自然对话、例程配置、多设备控制、自主监测以及任务完成/异常告知。",
+        "mediaNote": "ThinQ ON 产品图｜证明其为配备 AI 扬声器的家居中枢；图片本身不证明晨起功能。",
+        "mapping": "1、2、4、5、6、7",
+        "row": 18,
+        "images": [
+          {
+            "file": "./media/competitors/5-0.png",
+            "row": 18
+          }
+        ]
+      },
+      {
+        "text": "LG Global｜Live human with LG AI: Home\n https://www.lg.com/global/lifes-good-in-action/ai-home/",
+        "excerpt": "“listens to your commands and sense the surroundings”｜官方列出温度、湿度、空气质量与占用感知，并注明 ThinQ ON 主要先在韩国推出。",
+        "mediaNote": "产品/品牌页面｜证明语音、环境感知和地域可用性；未呈现专用晨起界面。",
+        "mapping": "1、2、3、5",
+        "row": 19,
+        "images": []
+      },
+      {
+        "text": "LG Global Newsroom｜LG Presents Its Latest Innovations Powered by “Affectionate Intelligence” at CES 2025\n https://www.lg.com/global/newsroom/news/corporate/lg-presents-its-latest-innovations-powered-by-affectionate-intelligence-at-ces-2025/",
+        "excerpt": "Rise & Shine 展区展示“a seamless start to the day”，并描述卧室人脸/声纹识别及基于睡眠模式的个性化内容与健康洞察。",
+        "mediaNote": "CES 2025 展示说明｜属于概念场景，不能直接等同于 ThinQ ON 的零售功能清单。",
+        "mapping": "3、4",
+        "row": 20,
+        "images": []
+      },
+      {
+        "text": "LG Global Newsroom｜A Technological Journey Through Affectionate Intelligence at CES 2025\n https://www.lg.com/global/newsroom/lg-story/beyond-news/a-technological-journey-through-affectionate-intelligence-at-ces-2025/",
+        "excerpt": "“detected someone starting their workday”｜随后自动按偏好调整房间的照明、温度与湿度；文中称本地 AI 中枢学习、分析生活模式。",
+        "mediaNote": "LG AI Home / FURON 展台图｜证明 CES 展示属性；不是实际控制界面或清醒识别证据。",
+        "mapping": "3、4、7",
+        "row": 21,
+        "images": [
+          {
+            "file": "./media/competitors/5-1.png",
+            "row": 21
+          }
+        ]
+      },
+      {
+        "text": "LG Australia Support｜LG ThinQ App – Support & Help\n https://www.lg.com/au/support/lg-thinq/app/",
+        "excerpt": "“Match your home to your day”｜官方说明 ThinQ routines 可在睡眠、度假或回家等情境中自动化智能家居设备。",
+        "mediaNote": "ThinQ App 支持页｜证明例程能力；不证明 ThinQ ON 自动生成晨起策略。",
+        "mapping": "1、2、4",
+        "row": 22,
+        "images": []
+      }
+    ],
+    "images": []
+  }
+]
